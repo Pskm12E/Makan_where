@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - MakanWhereSG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container nav">
+        <div class="brand">
+          <span class="brand-mark">🍽️</span>
+          <span>MakanWhereSG</span>
+        </div>
+        <nav class="nav-links">
+          <a href="index.html">Home</a>
+          <a href="browse.html">Browse</a>
+          <a href="favourites.html">Favourites</a>
+          <a href="admin.html" class="active">Admin</a>
+          <a href="analytics.html">Analytics</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container admin-shell">
+      <section class="content-panel">
+        <div class="results-header">
+          <h1>Admin dashboard</h1>
+        </div>
+
+        <div class="admin-grid">
+          <div class="admin-card">
+            <h3 id="adminFormTitle">Add establishment</h3>
+            <form id="adminForm" class="admin-form">
+              <input type="hidden" id="editId" value="" />
+              <input type="text" id="adminName" placeholder="Establishment name" required />
+              <input type="text" id="adminArea" placeholder="Area" required />
+              <input type="text" id="adminCategory" placeholder="Category" required />
+              <input type="text" id="adminCuisine" placeholder="Cuisine" required />
+              <input type="text" id="adminAddress" placeholder="Address" required />
+              <div class="admin-form-actions">
+                <button type="submit" id="adminSubmitBtn">Add establishment</button>
+                <button type="button" id="cancelEditBtn" class="secondary-btn hidden">Cancel</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="admin-card stats-card">
+            <h3>Quick stats</h3>
+            <div class="mini-stat-block">
+              <strong id="statsCount">0</strong>
+              <span>establishments</span>
+            </div>
+            <div class="mini-stat-block">
+              <strong id="statsAvgPrice">$0</strong>
+              <span>avg. menu price</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="adminEstablishments" class="admin-list"></div>
+      </section>
+    </main>
+
+    <script src="js/data.js"></script>
+    <script src="js/admin.js"></script>
+  </body>
+</html>

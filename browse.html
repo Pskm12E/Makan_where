@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Browse - MakanWhereSG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container nav">
+        <div class="brand">
+          <span class="brand-mark">🍽️</span>
+          <span>MakanWhereSG</span>
+        </div>
+        <nav class="nav-links">
+          <a href="index.html">Home</a>
+          <a href="browse.html" class="active">Browse</a>
+          <a href="favourites.html">Favourites</a>
+          <a href="admin.html">Admin</a>
+          <a href="analytics.html">Analytics</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container page-shell">
+      <aside class="filters-panel">
+        <h2>Filters</h2>
+
+        <div class="filter-group">
+          <label for="searchInput">Search</label>
+          <input id="searchInput" type="text" placeholder="Search establishment or cuisine" />
+        </div>
+
+        <div class="filter-group">
+          <label for="categoryFilter">Category</label>
+          <select id="categoryFilter">
+            <option value="all">All categories</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="cuisineFilter">Cuisine</label>
+          <select id="cuisineFilter">
+            <option value="all">All cuisines</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="areaFilter">Area</label>
+          <select id="areaFilter">
+            <option value="all">All areas</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="priceFilter">Price range</label>
+          <select id="priceFilter">
+            <option value="all">Any price</option>
+            <option value="under-5">Under $5</option>
+            <option value="5-10">$5 - $10</option>
+            <option value="10-20">$10 - $20</option>
+            <option value="20-plus">$20+</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="gradeFilter">Hygiene grade</label>
+          <select id="gradeFilter">
+            <option value="all">Any grade</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="sortSelect">Sort by</label>
+          <select id="sortSelect">
+            <option value="rating_desc">Rating: High to low</option>
+            <option value="price_asc">Price: Low to high</option>
+            <option value="name_asc">Name: A-Z</option>
+          </select>
+        </div>
+      </aside>
+
+      <section class="content-panel">
+        <div class="results-header">
+          <h1>Food spots in Singapore</h1>
+          <span id="resultsCount" class="results-count"></span>
+        </div>
+        <div id="establishmentList" class="card-grid results-grid"></div>
+      </section>
+    </main>
+
+    <script src="js/data.js"></script>
+    <script src="js/browse.js"></script>
+  </body>
+</html>

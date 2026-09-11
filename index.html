@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MakanWhereSG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container nav">
+        <div class="brand">
+          <span class="brand-mark">🍽️</span>
+          <span>MakanWhereSG</span>
+        </div>
+        <nav class="nav-links">
+          <a href="index.html" class="active">Home</a>
+          <a href="browse.html">Browse</a>
+          <a href="favourites.html">Favourites</a>
+          <a href="admin.html">Admin</a>
+          <a href="analytics.html">Analytics</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-inner">
+          <div class="hero-copy">
+            <p class="eyebrow">Discover Singapore food</p>
+            <h1>Find great food near you across Singapore.</h1>
+            <p class="subtitle">
+              Explore hawker favourites, cafes, restaurants, and hidden gems by cuisine,
+              budget, hygiene grade, and neighbourhood.
+            </p>
+            <div class="search-box">
+              <input id="homeSearch" type="text" placeholder="Search by name, cuisine, or area" />
+              <button id="homeSearchBtn">Search</button>
+            </div>
+            <div class="chip-row" id="homePopularTags"></div>
+          </div>
+          <div class="hero-card">
+            <div class="mini-stat">
+              <strong>100+</strong>
+              <span>establishments</span>
+            </div>
+            <div class="mini-stat">
+              <strong>4.4/5</strong>
+              <span>avg. rating</span>
+            </div>
+            <div class="mini-stat">
+              <strong>6</strong>
+              <span>cuisines</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div class="section-heading">
+            <h2>Featured establishments</h2>
+            <a href="browse.html">View all</a>
+          </div>
+          <div id="featuredGrid" class="card-grid"></div>
+        </div>
+      </section>
+
+      <section class="section alt-bg">
+        <div class="container">
+          <div class="section-heading">
+            <h2>Popular dishes</h2>
+          </div>
+          <div id="popularItems" class="popular-items"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <p>MakanWhereSG • Built for Singapore food discovery</p>
+      </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

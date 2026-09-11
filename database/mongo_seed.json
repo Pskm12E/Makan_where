@@ -1,0 +1,44 @@
+[
+  {
+    "establishment_id": 1,
+    "user_id": 1,
+    "overall_rating": 4.5,
+    "review_title": "Affordable and tasty lunch",
+    "review_text": "The meal was filling, reasonably priced, and served quickly.",
+    "visited_at": "2026-09-09",
+    "created_at": "2026-09-09T12:30:00",
+    "tags": ["budget-friendly", "quick-lunch", "halal-options"],
+    "dish_reviews": [
+      {
+        "dish_name": "Chicken Rice",
+        "dish_rating": 5,
+        "price_paid": 4.5
+      }
+    ],
+    "photo_metadata": [
+      {
+        "file_name": "chicken-rice.jpg",
+        "caption": "Roasted chicken rice set"
+      }
+    ],
+    "helpful_votes": 0
+  },
+  {
+    "establishment_id": 2,
+    "user_id": 2,
+    "overall_rating": 4.6,
+    "review_title": "Comforting Malay favourites",
+    "review_text": "Loved the nasi lemak and friendly service.",
+    "visited_at": "2026-09-07",
+    "created_at": "2026-09-07T18:20:00",
+    "tags": ["halal", "family"],
+    "dish_reviews": [
+      {
+        "dish_name": "Nasi Lemak",
+        "dish_rating": 4,
+        "price_paid": 8.5
+      }
+    ],
+    "helpful_votes": 2
+  }
+]
