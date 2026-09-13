@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Settings - MakanWhereSG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container nav">
+        <a class="brand" href="index.html"><span class="brand-mark">🍽️</span><span>MakanWhereSG</span></a>
+        <nav class="nav-links">
+          <a href="index.html">Home</a>
+          <a href="browse.html">Browse</a>
+          <a href="favourites.html">Favourites</a>
+          <a href="admin.html">Admin</a>
+          <a href="analytics.html">Analytics</a>
+          <span id="authActions"></span>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container settings-shell">
+      <section class="settings-intro">
+        <p class="eyebrow">Your account</p>
+        <h1>Personalise your MakanWhereSG experience.</h1>
+        <p>Keep your details up to date so your food trail stays connected to you.</p>
+      </section>
+
+      <section class="settings-grid">
+        <div class="settings-card">
+          <div class="settings-card-heading">
+            <span class="settings-icon">👤</span>
+            <div><h2>Profile details</h2><p>Basic information for your account.</p></div>
+          </div>
+          <form id="settingsForm" class="settings-form">
+            <label>Full name<input id="settingsName" type="text" required /></label>
+            <label>Username<input id="settingsUsername" type="text" required /></label>
+            <label>Gmail address<input id="settingsEmail" type="email" required /></label>
+            <label>Phone number<input id="settingsPhone" type="tel" required /></label>
+            <button class="auth-submit" type="submit">Save profile</button>
+            <div id="settingsNotice" class="form-notice" role="status"></div>
+          </form>
+        </div>
+
+        <aside class="settings-card settings-summary">
+          <div class="settings-avatar" id="settingsAvatar">M</div>
+          <h2 id="settingsSummaryName">Your profile</h2>
+          <p id="settingsSummaryEmail"></p>
+          <div class="summary-line"><span>Member since</span><strong id="settingsMemberSince"></strong></div>
+          <button id="logoutButton" class="secondary-btn" type="button">Log out</button>
+        </aside>
+      </section>
+    </main>
+
+    <script src="js/auth.js"></script>
+  </body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to MakanWhereSG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="auth-page">
+    <main class="auth-layout">
+      <section class="auth-story">
+        <a class="auth-brand" href="index.html">
+          <span class="brand-mark">🍽️</span>
+          <span>MakanWhereSG</span>
+        </a>
+        <div class="auth-story-copy">
+          <p class="eyebrow light">Your next makan starts here</p>
+          <h1>Good food is better when it feels like yours.</h1>
+          <p>Save the places you love, discover neighbourhood favourites, and keep your food trail in one delicious place.</p>
+          <div class="auth-food-note">
+            <span>今日吃什么?</span>
+            <strong>What are we eating today?</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="auth-panel">
+        <div class="auth-card">
+          <div id="authNotice" class="form-notice" role="status"></div>
+
+          <form id="loginForm" class="auth-form">
+            <div>
+              <p class="eyebrow">Welcome back</p>
+              <h2>Pick up where you left off.</h2>
+              <p class="form-help">Sign in to access your favourites and personal settings.</p>
+            </div>
+            <label>Email or username<input id="loginIdentity" type="text" autocomplete="username" required /></label>
+            <label>Password<input id="loginPassword" type="password" autocomplete="current-password" required /></label>
+            <button class="auth-submit" type="submit">Log in to MakanWhereSG</button>
+          </form>
+
+          <form id="registerForm" class="auth-form" hidden>
+            <div>
+              <p class="eyebrow">Join the table</p>
+              <h2>Make your food trail personal.</h2>
+              <p class="form-help">Use your Gmail address and phone number to create your demo account.</p>
+            </div>
+            <div class="form-two-col">
+              <label>Full name<input id="registerName" type="text" autocomplete="name" required /></label>
+              <label>Username<input id="registerUsername" type="text" autocomplete="username" required /></label>
+            </div>
+            <label>Gmail address<input id="registerEmail" type="email" placeholder="you@gmail.com" autocomplete="email" required /></label>
+            <label>Phone number<input id="registerPhone" type="tel" placeholder="e.g. 9123 4567" autocomplete="tel" required /></label>
+            <div class="form-two-col">
+              <label>Password<input id="registerPassword" type="password" autocomplete="new-password" required minlength="6" /></label>
+              <label>Confirm password<input id="registerConfirm" type="password" autocomplete="new-password" required minlength="6" /></label>
+            </div>
+            <button class="auth-submit" type="submit">Create my account</button>
+          </form>
+
+          <p id="authSwitch" class="auth-switch"></p>
+          <p class="auth-footnote">Prototype mode: account data is stored in this browser only.</p>
+        </div>
+      </section>
+    </main>
+
+    <script src="js/auth.js"></script>
+  </body>
+</html>

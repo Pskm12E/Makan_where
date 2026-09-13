@@ -17,6 +17,8 @@ MakanWhereSG is a Singapore food discovery and review system developed as an INF
 - `favourites.html` – saved favourites using localStorage
 - `admin.html` – mock admin dashboard
 - `analytics.html` – summary metrics and insights
+- `auth.html` – food-themed login and registration
+- `settings.html` – profile settings for name, username, Gmail, and phone
 
 ## Frontend stack
 
@@ -24,6 +26,16 @@ MakanWhereSG is a Singapore food discovery and review system developed as an INF
 - CSS3
 - Vanilla JavaScript
 - Responsive design for desktop and mobile
+
+## Prototype account features
+
+- Register with full name, username, Gmail address, phone number, and password.
+- Log in using the registered Gmail address or username.
+- Update profile details from the settings page.
+- Log out from the shared navigation or settings page.
+- Account data is stored in browser localStorage for this prototype only.
+
+This is not production authentication. Passwords are intentionally stored locally only to demonstrate the frontend flow. A production version should use the Flask backend, hashed passwords, server-side sessions or tokens, validation, and secure database storage.
 
 ## Local preview
 
