@@ -14,6 +14,38 @@ function getCurrentUser() {
   return getUsers().find(user => user.username === sessionUsername) || null;
 }
 
+function requireLoginForFavourite() {
+  if (getCurrentUser()) return true;
+
+  let bubble = document.getElementById('loginBubble');
+  if (!bubble) {
+    bubble = document.createElement('div');
+    bubble.id = 'loginBubble';
+    bubble.className = 'login-bubble';
+    bubble.setAttribute('role', 'status');
+    document.body.appendChild(bubble);
+  }
+
+  bubble.innerHTML = `
+    <span class="login-bubble-icon">♥</span>
+    <span>Log in to unlock favourites.</span>
+    <a href="auth.html?mode=login">Go to login</a>
+    <button type="button" aria-label="Close notification">×</button>
+  `;
+  bubble.classList.add('visible');
+
+  bubble.querySelector('button').addEventListener('click', () => {
+    bubble.classList.remove('visible');
+  }, { once: true });
+
+  window.clearTimeout(window.loginBubbleTimer);
+  window.loginBubbleTimer = window.setTimeout(() => {
+    bubble.classList.remove('visible');
+  }, 6000);
+
+  return false;
+}
+
 function setCurrentUser(user) {
   localStorage.setItem(authSessionKey, user.username);
 }

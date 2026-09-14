@@ -40,6 +40,7 @@ function renderFeaturedEstablishments() {
 
   document.querySelectorAll('[data-favourite]').forEach(button => {
     button.addEventListener('click', (event) => {
+      if (!requireLoginForFavourite()) return;
       const id = Number(event.currentTarget.dataset.favourite);
       toggleFavourite(id);
       renderFeaturedEstablishments();
@@ -78,11 +79,13 @@ function bindHomeSearch() {
 }
 
 function getFavouriteStatus(id) {
+  if (!getCurrentUser()) return false;
   const favourites = JSON.parse(localStorage.getItem(favouriteStorageKey) || '[]');
   return favourites.includes(id);
 }
 
 function toggleFavourite(id) {
+  if (!requireLoginForFavourite()) return;
   const favourites = JSON.parse(localStorage.getItem(favouriteStorageKey) || '[]');
   const index = favourites.indexOf(id);
   if (index >= 0) {

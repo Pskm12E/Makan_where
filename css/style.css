@@ -137,6 +137,59 @@ select {
   cursor: pointer;
 }
 
+.login-bubble {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 14px 16px;
+  border: 1px solid rgba(232, 93, 63, 0.2);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 16px 36px rgba(54, 34, 22, 0.18);
+  color: var(--text);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(16px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.login-bubble.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.login-bubble-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #fff0e9;
+  color: var(--primary);
+}
+
+.login-bubble a {
+  color: var(--primary);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.login-bubble button {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
 .hero {
   padding: 56px 0 32px;
   background: linear-gradient(180deg, #fff8f2, var(--background));

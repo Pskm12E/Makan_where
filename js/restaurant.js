@@ -15,7 +15,9 @@ function renderRestaurantDetail() {
     return;
   }
 
-  const favouriteIds = JSON.parse(localStorage.getItem(favouriteStorageKey) || '[]');
+  const favouriteIds = getCurrentUser()
+    ? JSON.parse(localStorage.getItem(favouriteStorageKey) || '[]')
+    : [];
   const isFavourite = favouriteIds.includes(id);
   const reviews = mockReviews.filter(review => review.establishmentId === id);
 
@@ -117,6 +119,7 @@ function renderRestaurantDetail() {
   [favouriteButton, favouriteSecondaryButton].forEach((button) => {
     if (!button) return;
     button.addEventListener('click', () => {
+      if (!requireLoginForFavourite()) return;
       toggleFavourite(id);
       renderRestaurantDetail();
     });
@@ -152,6 +155,7 @@ function getFavouriteStatus(id) {
 }
 
 function toggleFavourite(id) {
+  if (!requireLoginForFavourite()) return;
   const favourites = JSON.parse(localStorage.getItem(favouriteStorageKey) || '[]');
   const index = favourites.indexOf(id);
   if (index >= 0) {

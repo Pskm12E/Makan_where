@@ -6,6 +6,17 @@ function renderFavouriteList() {
   const container = document.getElementById('favouriteList');
   if (!container) return;
 
+  if (!getCurrentUser()) {
+    container.innerHTML = `
+      <div class="favourite-empty">
+        <strong>Log in to see your favourites.</strong>
+        <p>Save food spots you love and find them here later.</p>
+        <a class="small-action" href="auth.html?mode=login">Go to login</a>
+      </div>
+    `;
+    return;
+  }
+
   const favouriteIds = JSON.parse(localStorage.getItem(favouriteStorageKey) || '[]');
   const favourites = foodFinderData.filter(item => favouriteIds.includes(item.id));
 
@@ -46,6 +57,7 @@ function renderFavouriteList() {
 
   container.querySelectorAll('[data-remove],[data-favourite]').forEach(button => {
     button.addEventListener('click', (event) => {
+      if (!requireLoginForFavourite()) return;
       const id = Number(event.currentTarget.dataset.remove || event.currentTarget.dataset.favourite);
       toggleFavourite(id);
       renderFavouriteList();
@@ -54,6 +66,7 @@ function renderFavouriteList() {
 }
 
 function toggleFavourite(id) {
+  if (!requireLoginForFavourite()) return;
   const favourites = JSON.parse(localStorage.getItem(favouriteStorageKey) || '[]');
   const index = favourites.indexOf(id);
   if (index >= 0) {
