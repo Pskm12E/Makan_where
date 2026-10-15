@@ -1,69 +1,17 @@
-document.addEventListener('DOMContentLoaded', () => {
-  renderAnalytics();
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!await appReady) return;
+  await withAction(null, renderAnalytics);
 });
 
-function renderAnalytics() {
-  const container = document.getElementById('analyticsCards');
-  if (!container) return;
-
-  const topRated = [...foodFinderData].sort((a, b) => b.rating - a.rating).slice(0, 3);
-  const mostFavourited = [...foodFinderData].sort((a, b) => getFavouriteCount(b.id) - getFavouriteCount(a.id)).slice(0, 3);
-  const topCuisines = Object.entries(
-    foodFinderData.reduce((acc, item) => {
-      acc[item.cuisine] = (acc[item.cuisine] || 0) + 1;
-      return acc;
-    }, {})
-  ).sort((a, b) => b[1] - a[1]).slice(0, 3);
-
-  const affordable = [...foodFinderData]
-    .flatMap(item => item.menu.map(menuItem => ({ name: menuItem.name, price: menuItem.price, establishment: item.name })))
-    .sort((a, b) => a.price - b.price)
-    .slice(0, 3);
-
-  const reviewTags = mockReviews.flatMap(item => item.tags).reduce((acc, tag) => {
-    acc[tag] = (acc[tag] || 0) + 1;
-    return acc;
-  }, {});
-
-  container.innerHTML = `
-    <article class="analytics-card">
-      <h3>Top-rated establishments</h3>
-      <ul>
-        ${topRated.map(item => `<li>${item.name} — ${item.rating.toFixed(1)}</li>`).join('')}
-      </ul>
-    </article>
-
-    <article class="analytics-card">
-      <h3>Most favourited</h3>
-      <ul>
-        ${mostFavourited.map(item => `<li>${item.name} — ${getFavouriteCount(item.id)} saves</li>`).join('')}
-      </ul>
-    </article>
-
-    <article class="analytics-card">
-      <h3>Popular cuisines</h3>
-      <ul>
-        ${topCuisines.map(([cuisine, count]) => `<li>${cuisine} — ${count} venues</li>`).join('')}
-      </ul>
-    </article>
-
-    <article class="analytics-card">
-      <h3>Affordable items</h3>
-      <ul>
-        ${affordable.map(item => `<li>${item.name} (${item.establishment}) — $${item.price.toFixed(2)}</li>`).join('')}
-      </ul>
-    </article>
-
-    <article class="analytics-card">
-      <h3>Common review tags</h3>
-      <ul>
-        ${Object.entries(reviewTags).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([tag, count]) => `<li>${tag} — ${count}</li>`).join('')}
-      </ul>
-    </article>
-  `;
-}
-
-function getFavouriteCount(id) {
-  const favourites = JSON.parse(localStorage.getItem(favouriteStorageKey) || '[]');
-  return favourites.filter(itemId => itemId === id).length;
+async function renderAnalytics() {
+  const {discovery, topRated, mostFavourited, cuisineCoverage, affordableItems, affordableMenus} = await api('/analytics');
+  const sample = row => row.isSample ? ' (sample menu)' : '';
+  const card = (title, rows, empty) => `<article class="analytics-card"><h3>${title}</h3>${rows.length ? `<ul>${rows.map(row => `<li>${row}</li>`).join('')}</ul>` : `<p>${empty}</p>`}</article>`;
+  document.getElementById('analyticsCards').innerHTML =
+    card('Top-rated establishments', topRated.map(p => `${escapeHtml(p.name)} — ${ratingLabel(p.rating)} (${p.reviewCount} reviews)${p.isSample ? ' · sample listing / demo activity' : ''}`), 'No reviews yet.') +
+    card('Most favourited', mostFavourited.map(p => `${escapeHtml(p.name)} — ${p.favouriteCount} saves${p.isSample ? ' · sample listing / demo activity' : ''}`), 'No favourites yet.') +
+    card('Cuisine coverage', cuisineCoverage.map(c => `${escapeHtml(c.name)} — ${c.venueCount} venues`), 'No cuisines yet.') +
+    card('Affordable items', affordableItems.map(d => `${escapeHtml(d.name)} (${escapeHtml(d.place)}) — ${priceLabel(d.price)}${sample(d)}`), 'No available menu items.') +
+    card('Menus averaging $12 or less', affordableMenus.map(p => `${escapeHtml(p.name)} — ${priceLabel(p.averagePrice)} average across ${p.dishCount} dishes${sample(p)}`), 'No qualifying menus with known prices.') +
+    card('Discovery activity', [`${discovery.search || 0} searches`, `${discovery.place_view || 0} place views`], 'No activity yet.');
 }

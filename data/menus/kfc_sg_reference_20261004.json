@@ -1,0 +1,497 @@
+{
+  "sourceName": "KFC Singapore official menu",
+  "sourceUrl": "https://www.kfc.com.sg/menu",
+  "observedAt": "2026-10-04T04:35:00Z",
+  "currency": "SGD",
+  "isReference": true,
+  "matchNames": [
+    "KFC"
+  ],
+  "items": [
+    {
+      "sourceId": "2-pcs-chicken-meal",
+      "name": "2 pcs Chicken Meal",
+      "price": "9.95"
+    },
+    {
+      "sourceId": "3-pcs-chicken-meal",
+      "name": "3 pcs Chicken Meal",
+      "price": "12.70"
+    },
+    {
+      "sourceId": "or-tenders-3-pcs-meal",
+      "name": "O.R. Tenders (3 pcs Meal)",
+      "price": "8.15"
+    },
+    {
+      "sourceId": "crispy-chicken-bites-6-pcs-meal",
+      "name": "Crispy Chicken Bites (6 pcs Meal)",
+      "price": "7.80"
+    },
+    {
+      "sourceId": "5-pcs-chicken-bucket",
+      "name": "5 pcs Chicken Bucket",
+      "price": "18.50"
+    },
+    {
+      "sourceId": "8-pcs-chicken-bucket",
+      "name": "8 pcs Chicken Bucket",
+      "price": "28.30"
+    },
+    {
+      "sourceId": "5-pcs-buddy-meal",
+      "name": "5 pcs Buddy Meal",
+      "price": "22.95"
+    },
+    {
+      "sourceId": "8-pcs-family-feast",
+      "name": "8 pcs Family Feast",
+      "price": "38.95"
+    },
+    {
+      "sourceId": "original-recipe-chicken",
+      "name": "Original Recipe Chicken",
+      "price": "4.50"
+    },
+    {
+      "sourceId": "hot-and-crispy-chicken",
+      "name": "Hot & Crispy Chicken",
+      "price": "4.50"
+    },
+    {
+      "sourceId": "original-recipe-burger",
+      "name": "Original Recipe Burger",
+      "price": "7.00"
+    },
+    {
+      "sourceId": "original-recipe-burger-meal",
+      "name": "Original Recipe Burger Meal",
+      "price": "8.35"
+    },
+    {
+      "sourceId": "original-recipe-burger-box",
+      "name": "Original Recipe Burger Box",
+      "price": "11.55"
+    },
+    {
+      "sourceId": "original-recipe-stacker",
+      "name": "Original Recipe Stacker",
+      "price": "9.00"
+    },
+    {
+      "sourceId": "original-recipe-stacker-meal",
+      "name": "Original Recipe Stacker Meal",
+      "price": "10.35"
+    },
+    {
+      "sourceId": "original-recipe-stacker-box",
+      "name": "Original Recipe Stacker Box",
+      "price": "13.55"
+    },
+    {
+      "sourceId": "zinger",
+      "name": "Zinger",
+      "price": "7.00"
+    },
+    {
+      "sourceId": "zinger-meal",
+      "name": "Zinger Meal",
+      "price": "8.35"
+    },
+    {
+      "sourceId": "zinger-box",
+      "name": "Zinger Box",
+      "price": "11.55"
+    },
+    {
+      "sourceId": "zinger-stacker",
+      "name": "Zinger Stacker",
+      "price": "9.00"
+    },
+    {
+      "sourceId": "zinger-stacker-meal",
+      "name": "Zinger Stacker Meal",
+      "price": "10.35"
+    },
+    {
+      "sourceId": "zinger-stacker-box",
+      "name": "Zinger Stacker Box",
+      "price": "13.55"
+    },
+    {
+      "sourceId": "the-ultimate-smokey-zinger",
+      "name": "The Ultimate Smokey Zinger",
+      "price": "8.25"
+    },
+    {
+      "sourceId": "the-ultimate-smokey-zinger-meal",
+      "name": "The Ultimate Smokey Zinger Meal",
+      "price": "9.60"
+    },
+    {
+      "sourceId": "the-ultimate-smokey-zinger-box",
+      "name": "The Ultimate Smokey Zinger Box",
+      "price": "12.80"
+    },
+    {
+      "sourceId": "bbq-pockett",
+      "name": "BBQ Pockett",
+      "price": "7.60"
+    },
+    {
+      "sourceId": "bbq-pockett-meal",
+      "name": "BBQ Pockett Meal",
+      "price": "8.95"
+    },
+    {
+      "sourceId": "bbq-pockett-box",
+      "name": "BBQ Pockett Box",
+      "price": "12.15"
+    },
+    {
+      "sourceId": "loaded-salad-bowl",
+      "name": "Loaded Salad Bowl",
+      "price": "7.85"
+    },
+    {
+      "sourceId": "mac-n-cheese-bowl",
+      "name": "Mac N Cheese Bowl",
+      "price": "6.20"
+    },
+    {
+      "sourceId": "mac-n-cheese-bowl-box",
+      "name": "Mac N Cheese Bowl Box",
+      "price": "11.30"
+    },
+    {
+      "sourceId": "3-pcs-original-recipe-tenders",
+      "name": "3 pcs Original Recipe Tenders",
+      "price": "6.80"
+    },
+    {
+      "sourceId": "5-pcs-original-recipe-tenders",
+      "name": "5 pcs Original Recipe Tenders",
+      "price": "9.45"
+    },
+    {
+      "sourceId": "6-pcs-hot-crispy-chicken-bites",
+      "name": "6 pcs Hot & Crispy Chicken Bites",
+      "price": "6.40"
+    },
+    {
+      "sourceId": "9-pcs-hot-crispy-chicken-bites",
+      "name": "9 pcs Hot & Crispy Chicken Bites",
+      "price": "8.30"
+    },
+    {
+      "sourceId": "20-pcs-hot-crispy-chicken-bites",
+      "name": "20 pcs Hot & Crispy Chicken Bites",
+      "price": "13.80"
+    },
+    {
+      "sourceId": "snacker-box-4-pcs-hot-crispy-chicken-bites-with-reg-fries",
+      "name": "Snacker Box 4 pcs Hot & Crispy Chicken Bites With Reg Fries",
+      "price": "3.95"
+    },
+    {
+      "sourceId": "snacker-box-2pcs-tenders-with-reg-fries",
+      "name": "Snacker Box 2pcs Tenders With Reg Fries",
+      "price": "3.95"
+    },
+    {
+      "sourceId": "side-salad-cup",
+      "name": "Side Salad Cup",
+      "price": "4.50"
+    },
+    {
+      "sourceId": "corn-cup",
+      "name": "Corn Cup",
+      "price": "3.30"
+    },
+    {
+      "sourceId": "cheese-fries",
+      "name": "Cheese Fries",
+      "price": "5.65"
+    },
+    {
+      "sourceId": "fries-regular",
+      "name": "Fries Regular",
+      "price": "3.55"
+    },
+    {
+      "sourceId": "fries-medium",
+      "name": "Fries Medium",
+      "price": "4.55"
+    },
+    {
+      "sourceId": "whipped-potato-regular",
+      "name": "Whipped Potato Regular",
+      "price": "3.30"
+    },
+    {
+      "sourceId": "whipped-potato-medium",
+      "name": "Whipped Potato Medium",
+      "price": "4.50"
+    },
+    {
+      "sourceId": "coleslaw-regular",
+      "name": "Coleslaw Regular",
+      "price": "3.30"
+    },
+    {
+      "sourceId": "coleslaw-medium",
+      "name": "Coleslaw Medium",
+      "price": "4.50"
+    },
+    {
+      "sourceId": "mac-n-cheese-med",
+      "name": "Mac N Cheese Med",
+      "price": "4.50"
+    },
+    {
+      "sourceId": "egg-tart",
+      "name": "Egg Tart",
+      "price": "2.00"
+    },
+    {
+      "sourceId": "6-pcs-egg-tarts",
+      "name": "6 pcs Egg Tarts",
+      "price": "10.00"
+    },
+    {
+      "sourceId": "o-r-gravy",
+      "name": "O.R Gravy",
+      "price": "1.80"
+    },
+    {
+      "sourceId": "cheesy-onion-dip",
+      "name": "Cheesy Onion Dip",
+      "price": "0.95"
+    },
+    {
+      "sourceId": "shh-secret-grill-dip",
+      "name": "Shh Secret Grill Dip",
+      "price": "0.95"
+    },
+    {
+      "sourceId": "flaming-hot-sauce",
+      "name": "Flaming Hot Sauce",
+      "price": "0.95"
+    },
+    {
+      "sourceId": "chipotle-honey-mustard-dip",
+      "name": "Chipotle Honey Mustard Dip",
+      "price": "0.95"
+    },
+    {
+      "sourceId": "seoul-spicy-dip",
+      "name": "Seoul Spicy Dip",
+      "price": "0.95"
+    },
+    {
+      "sourceId": "cheese-sauce",
+      "name": "Cheese Sauce",
+      "price": "1.80"
+    },
+    {
+      "sourceId": "mayonnaise",
+      "name": "Mayonnaise",
+      "price": "0.95"
+    },
+    {
+      "sourceId": "caesar-dressing",
+      "name": "Caesar Dressing",
+      "price": "1.50"
+    },
+    {
+      "sourceId": "black-vinegar-onion-dressing",
+      "name": "Black Vinegar Onion Dressing",
+      "price": "1.50"
+    },
+    {
+      "sourceId": "ruby-k-fizz-alc",
+      "name": "Ruby K-Fizz ALC",
+      "price": "4.25"
+    },
+    {
+      "sourceId": "coca-cola-zero-sugar-regular",
+      "name": "Coca-Cola® Zero Sugar Regular",
+      "price": "3.55"
+    },
+    {
+      "sourceId": "coca-cola-zero-sugar-medium",
+      "name": "Coca-Cola® Zero Sugar Medium",
+      "price": "4.25"
+    },
+    {
+      "sourceId": "coca-cola-original-taste-less-sugar-regular",
+      "name": "Coca-Cola® Original Taste Less Sugar Regular",
+      "price": "3.55"
+    },
+    {
+      "sourceId": "coca-cola-original-taste-less-sugar-medium",
+      "name": "Coca-Cola® Original Taste Less Sugar Medium",
+      "price": "4.25"
+    },
+    {
+      "sourceId": "sprite-regular",
+      "name": "Sprite® Regular",
+      "price": "3.55"
+    },
+    {
+      "sourceId": "sprite-medium",
+      "name": "Sprite® Medium",
+      "price": "4.25"
+    },
+    {
+      "sourceId": "fanta-grape-regular",
+      "name": "Fanta® Grape Regular",
+      "price": "3.55"
+    },
+    {
+      "sourceId": "fanta-grape-medium",
+      "name": "Fanta® Grape Medium",
+      "price": "4.25"
+    },
+    {
+      "sourceId": "sjora-mango-peach-regular",
+      "name": "Sjora Mango Peach Regular",
+      "price": "4.25"
+    },
+    {
+      "sourceId": "sjora-mango-peach-medium",
+      "name": "Sjora Mango Peach Medium",
+      "price": "4.75"
+    },
+    {
+      "sourceId": "minute-maid-orange-regular",
+      "name": "Minute Maid Orange Regular",
+      "price": "4.05"
+    },
+    {
+      "sourceId": "minute-maid-orange-medium",
+      "name": "Minute Maid Orange Medium",
+      "price": "4.75"
+    },
+    {
+      "sourceId": "iced-milo-regular",
+      "name": "Iced Milo Regular",
+      "price": "4.50"
+    },
+    {
+      "sourceId": "iced-milo-medium",
+      "name": "Iced Milo Medium",
+      "price": "4.95"
+    },
+    {
+      "sourceId": "fuze-tea-iced-lemon-tea-regular",
+      "name": "Fuze Tea Iced Lemon Tea Regular",
+      "price": "4.35"
+    },
+    {
+      "sourceId": "fuze-tea-iced-lemon-tea-medium",
+      "name": "Fuze Tea Iced Lemon Tea Medium",
+      "price": "4.65"
+    },
+    {
+      "sourceId": "dasani-drinking-water",
+      "name": "Dasani® Drinking Water",
+      "price": "3.00"
+    },
+    {
+      "sourceId": "black-coffee",
+      "name": "Black Coffee",
+      "price": "3.45"
+    },
+    {
+      "sourceId": "white-coffee",
+      "name": "White Coffee",
+      "price": "3.45"
+    },
+    {
+      "sourceId": "cappuccino",
+      "name": "Cappuccino",
+      "price": "4.45"
+    },
+    {
+      "sourceId": "latte",
+      "name": "Latte",
+      "price": "4.45"
+    },
+    {
+      "sourceId": "mocha",
+      "name": "Mocha",
+      "price": "4.70"
+    },
+    {
+      "sourceId": "hot-milo",
+      "name": "Hot Milo",
+      "price": "3.70"
+    },
+    {
+      "sourceId": "hot-tea-w-milk",
+      "name": "Hot Tea w/Milk",
+      "price": "3.45"
+    },
+    {
+      "sourceId": "hot-tea-o",
+      "name": "Hot Tea O",
+      "price": "3.45"
+    },
+    {
+      "sourceId": "low-fat-high-calcium-fresh-milk",
+      "name": "Low Fat High Calcium Fresh Milk",
+      "price": "3.70"
+    },
+    {
+      "sourceId": "red-bull-energy-drink",
+      "name": "Red Bull Energy Drink",
+      "price": "4.95"
+    },
+    {
+      "sourceId": "red-bull-sugar-free",
+      "name": "Red Bull Sugar Free",
+      "price": "4.95"
+    },
+    {
+      "sourceId": "apple-juice",
+      "name": "Apple Juice",
+      "price": "3.30"
+    },
+    {
+      "sourceId": "lil-tenders-twister-meal",
+      "name": "Lil' Tenders Twister Meal",
+      "price": "5.95"
+    },
+    {
+      "sourceId": "lil-tenders-meal",
+      "name": "Lil' Tenders Meal",
+      "price": "5.95"
+    },
+    {
+      "sourceId": "lil-chicken-meal",
+      "name": "Lil' Chicken Meal",
+      "price": "5.95"
+    },
+    {
+      "sourceId": "lil-bucket-family-meal",
+      "name": "Lil' Bucket Family Meal",
+      "price": "20.95"
+    },
+    {
+      "sourceId": "loaded-salad-bowl-meal",
+      "name": "Loaded Salad Bowl Meal",
+      "price": "8.95"
+    },
+    {
+      "sourceId": "loaded-salad-bowl-box",
+      "name": "Loaded Salad Bowl Box",
+      "price": "11.95"
+    },
+    {
+      "sourceId": "famous-potato-bowl",
+      "name": "Famous Potato Bowl",
+      "price": "5.00"
+    }
+  ]
+}

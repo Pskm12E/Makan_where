@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/style.css?v=2d0c85c8c44b" />
   </head>
   <body>
     <header class="topbar">
@@ -40,8 +40,8 @@
           <form id="settingsForm" class="settings-form">
             <label>Full name<input id="settingsName" type="text" required /></label>
             <label>Username<input id="settingsUsername" type="text" required /></label>
-            <label>Gmail address<input id="settingsEmail" type="email" required /></label>
-            <label>Phone number<input id="settingsPhone" type="tel" required /></label>
+            <label>Email address<input id="settingsEmail" type="email" required /></label>
+            <label>Phone number (optional)<input id="settingsPhone" type="tel" /></label>
             <button class="auth-submit" type="submit">Save profile</button>
             <div id="settingsNotice" class="form-notice" role="status"></div>
           </form>
@@ -57,6 +57,7 @@
       </section>
     </main>
 
-    <script src="js/auth.js"></script>
+    <script src="js/api.js?v=31aaa4aa5fa6"></script>
+    <script src="js/auth.js?v=3f3ce9f00478"></script>
   </body>
 </html>

@@ -1,0 +1,744 @@
+{
+  "formatVersion": 1,
+  "startedAt": "2026-10-06T10:50:15.482554+00:00",
+  "finishedAt": "2026-10-06T10:54:08.392731+00:00",
+  "sourceSha256": "9676b20f9687935d05a5c92c556ed48806e9b836056d5d701a4462eb45523a89",
+  "sourceUnchangedDuringRun": true,
+  "fullSuite": true,
+  "exitCode": 0,
+  "passed": true,
+  "seconds": 232.955,
+  "summary": {
+    "passed": 80
+  },
+  "environment": {
+    "os": "Windows",
+    "python": "3.14.7",
+    "cpuCount": 24,
+    "sqlTarget": "SQLite"
+  },
+  "scope": "Independent Flask test clients and real database drivers in disposable databases. Not an HTTP/network load test.",
+  "experiments": [
+    {
+      "test": "tests/test_database_evaluation.py::test_mongo_lifecycle_and_embedded_atomicity",
+      "outcome": "passed",
+      "seconds": 2.1286832000005234,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "MongoDB operations",
+        "invariant": "Validated document updates are atomic; ownership, aggregation and soft-delete visibility agree.",
+        "observed": {
+          "documentsRetained": 3,
+          "visibleAfterRemoval": 0,
+          "invalidUpdateCode": 121,
+          "legacySqlContentRows": 0
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_cross_database_audit_detects_each_broken_reference[authors]",
+      "outcome": "passed",
+      "seconds": 1.636570100003155,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Cross-database behaviour",
+        "invariant": "Reconciliation reports an out-of-band broken authors reference.",
+        "observed": {
+          "authors": 1,
+          "places": 0,
+          "dishLinks": 0,
+          "threadLinks": 0,
+          "votes": 0,
+          "reports": 0
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_cross_database_audit_detects_each_broken_reference[places]",
+      "outcome": "passed",
+      "seconds": 1.537817599997652,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Cross-database behaviour",
+        "invariant": "Reconciliation reports an out-of-band broken places reference.",
+        "observed": {
+          "authors": 0,
+          "places": 1,
+          "dishLinks": 1,
+          "threadLinks": 0,
+          "votes": 0,
+          "reports": 0
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_cross_database_audit_detects_each_broken_reference[dishLinks]",
+      "outcome": "passed",
+      "seconds": 1.6169155000025057,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Cross-database behaviour",
+        "invariant": "Reconciliation reports an out-of-band broken dishLinks reference.",
+        "observed": {
+          "authors": 0,
+          "places": 0,
+          "dishLinks": 1,
+          "threadLinks": 0,
+          "votes": 0,
+          "reports": 0
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_cross_database_audit_detects_each_broken_reference[threadLinks]",
+      "outcome": "passed",
+      "seconds": 1.5186963000014657,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Cross-database behaviour",
+        "invariant": "Reconciliation reports an out-of-band broken threadLinks reference.",
+        "observed": {
+          "authors": 0,
+          "places": 0,
+          "dishLinks": 0,
+          "threadLinks": 1,
+          "votes": 0,
+          "reports": 0
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_cross_database_audit_detects_each_broken_reference[votes]",
+      "outcome": "passed",
+      "seconds": 1.492940100000851,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Cross-database behaviour",
+        "invariant": "Reconciliation reports an out-of-band broken votes reference.",
+        "observed": {
+          "authors": 0,
+          "places": 0,
+          "dishLinks": 0,
+          "threadLinks": 0,
+          "votes": 1,
+          "reports": 0
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_cross_database_audit_detects_each_broken_reference[reports]",
+      "outcome": "passed",
+      "seconds": 1.50238580000223,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Cross-database behaviour",
+        "invariant": "Reconciliation reports an out-of-band broken reports reference.",
+        "observed": {
+          "authors": 0,
+          "places": 0,
+          "dishLinks": 0,
+          "threadLinks": 0,
+          "votes": 0,
+          "reports": 1
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_archived_sql_place_keeps_references_but_hides_mongo_content",
+      "outcome": "passed",
+      "seconds": 2.02144639999824,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Cross-database behaviour",
+        "invariant": "SQL soft archive hides community access while retaining valid SQL/Mongo references.",
+        "observed": {
+          "retained": true,
+          "publicRead": 404,
+          "edit": 404,
+          "orphans": 0
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_simultaneous_favourite_put_is_idempotent",
+      "outcome": "passed",
+      "seconds": 2.0519012000004295,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Concurrency and recovery",
+        "invariant": "Six concurrent PUT requests per user/place all succeed and retain one favourite per pair.",
+        "observed": {
+          "workers": 6,
+          "requests": 24,
+          "httpStatuses": {
+            "200": 24
+          },
+          "storedPairs": 4
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_simultaneous_votes_and_content_ids",
+      "outcome": "passed",
+      "seconds": 2.1188903999973263,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Concurrency and recovery",
+        "invariant": "Atomic Mongo counters allocate distinct IDs and the compound unique index retains one vote per pair.",
+        "observed": {
+          "workers": 6,
+          "voteRequests": 24,
+          "storedVotes": 1,
+          "createRequests": 24,
+          "uniqueCreatedIds": 24
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_simultaneous_report_resolution_has_one_winner",
+      "outcome": "passed",
+      "seconds": 2.145393499999045,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Concurrency and recovery",
+        "invariant": "Conditional status=open update permits exactly one moderation decision.",
+        "observed": {
+          "workers": 6,
+          "httpStatuses": {
+            "409": 5,
+            "200": 1
+          },
+          "winningDecisionRetained": true
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_population_resumes_after_partial_mongo_failure[before_write]",
+      "outcome": "passed",
+      "seconds": 37.19291689999591,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Concurrency and recovery",
+        "invariant": "A committed SQL phase and partial Mongo phase resume without duplicates or overwriting edits.",
+        "observed": {
+          "injectedAt": "before_write",
+          "partialDocuments": 17,
+          "recovered": {
+            "content": 720,
+            "upvotes": 600,
+            "reports": 20
+          },
+          "repeatAdded": 0,
+          "sqlRowsUnchangedOnResume": true
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_population_resumes_after_partial_mongo_failure[after_write_before_ack]",
+      "outcome": "passed",
+      "seconds": 37.243965200003004,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Concurrency and recovery",
+        "invariant": "A committed SQL phase and partial Mongo phase resume without duplicates or overwriting edits.",
+        "observed": {
+          "injectedAt": "after_write_before_ack",
+          "partialDocuments": 18,
+          "recovered": {
+            "content": 720,
+            "upvotes": 600,
+            "reports": 20
+          },
+          "repeatAdded": 0,
+          "sqlRowsUnchangedOnResume": true
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_failure_after_content_commit_is_detectably_ambiguous",
+      "outcome": "passed",
+      "seconds": 1.628771699997742,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Concurrency and recovery",
+        "invariant": "A 503 after a Mongo commit must not be described as rollback; read-back reveals the committed post.",
+        "observed": {
+          "httpStatus": 503,
+          "documentsCommitted": 1,
+          "readAfterRecovery": 200,
+          "automaticPostRetrySafe": false
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_sql_failure_blocks_mongo_write_then_recovers",
+      "outcome": "passed",
+      "seconds": 1.8876240999998117,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Cross-database behaviour",
+        "invariant": "Failed SQL reference lookup prevents Mongo insert; restored SQL allows the request.",
+        "observed": {
+          "failureStatus": 503,
+          "writesDuringFailure": 0,
+          "retryStatus": 201
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_real_disconnect_rolls_back_sql_and_preserves_acknowledged_mongo_write",
+      "outcome": "passed",
+      "seconds": 1.7479616000018723,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Concurrency and recovery",
+        "invariant": "Real SQL connection closure rolls back uncommitted work; an independent Mongo client reads an acknowledged write.",
+        "observed": {
+          "sqlUncommittedRowsAfterReconnect": 0,
+          "mongoAcknowledgedDocumentsRead": 1,
+          "databaseProcessRestarted": false
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_recorded_evaluation_access_and_stale_detection",
+      "outcome": "passed",
+      "seconds": 2.271554800001468,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Evidence integrity",
+        "invariant": "Recorded results are admin-only and stale/missing results cannot masquerade as current measurements.",
+        "observed": {
+          "guest": 401,
+          "normalUser": 403,
+          "missing": "not_run",
+          "oldSource": "stale"
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_controlled_sql_index_benchmark",
+      "outcome": "passed",
+      "seconds": 1.4170914999995148,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Controlled benchmarks",
+        "invariant": "Indexed and forced-scan SQL variants return identical ordered rows under the same workload.",
+        "observed": {
+          "warmupsPerVariant": 3,
+          "repetitionsPerVariant": 20,
+          "order": "alternating paired order",
+          "resultRows": 20,
+          "resultSha256": "1c0fe1f75c655d609feab3418d47d93f6de52cb3e1a0ab36f847dcba4587e2f2",
+          "indexed": {
+            "samplesMs": [
+              0.2605,
+              0.2196,
+              0.2528,
+              0.2339,
+              0.2403,
+              0.5804,
+              0.7211,
+              0.1892,
+              0.3051,
+              0.1617,
+              0.1502,
+              0.146,
+              0.1634,
+              0.1444,
+              0.1419,
+              0.1416,
+              0.1792,
+              0.2158,
+              0.1618,
+              0.4932
+            ],
+            "medianMs": 0.2025,
+            "p95Ms": 0.5804,
+            "minMs": 0.1416,
+            "maxMs": 0.7211
+          },
+          "scan": {
+            "samplesMs": [
+              0.6322,
+              0.5707,
+              0.5203,
+              0.5969,
+              0.557,
+              0.8097,
+              0.573,
+              0.4016,
+              0.5321,
+              0.3605,
+              0.3153,
+              0.3127,
+              0.3427,
+              0.3118,
+              0.3112,
+              0.3123,
+              0.4579,
+              0.6035,
+              0.6018,
+              0.8749
+            ],
+            "medianMs": 0.5262,
+            "p95Ms": 0.8097,
+            "minMs": 0.3112,
+            "maxMs": 0.8749
+          },
+          "datasetRows": 30018,
+          "indexedSql": "SELECT dish_id, price FROM dish INDEXED BY ix_dish_place_id WHERE place_id=1 AND is_available=1 ORDER BY dish_id LIMIT 20",
+          "scanSql": "SELECT dish_id, price FROM dish NOT INDEXED WHERE place_id=1 AND is_available=1 ORDER BY dish_id LIMIT 20",
+          "indexedPlan": [
+            [
+              5,
+              0,
+              60,
+              "SEARCH dish USING INDEX ix_dish_place_id (place_id=?)"
+            ]
+          ],
+          "scanPlan": [
+            [
+              4,
+              0,
+              216,
+              "SCAN dish"
+            ]
+          ],
+          "cache": "warm; no server cache flush",
+          "optimizerDefaultPlan": [
+            [
+              5,
+              0,
+              60,
+              "SEARCH dish USING INDEX ix_dish_place_id (place_id=?)"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "test": "tests/test_database_evaluation.py::test_controlled_mongo_index_benchmark",
+      "outcome": "passed",
+      "seconds": 3.295194400001492,
+      "evidence": {
+        "engines": {
+          "sql": "3.50.4",
+          "mongo": "8.0.19",
+          "sqlIsolation": "SERIALIZABLE",
+          "mongoTopology": "standalone",
+          "mongoWriteConcern": "server default"
+        },
+        "area": "Controlled benchmarks",
+        "invariant": "Same Mongo feed query/results; executionStats measures document work for index versus collection scan.",
+        "observed": {
+          "warmupsPerVariant": 3,
+          "repetitionsPerVariant": 20,
+          "order": "alternating paired order",
+          "resultRows": 20,
+          "resultSha256": "a502d55f83421d861c79b46f55c3f67d80b53a6d55fd6247fc38398c76e0339e",
+          "indexed": {
+            "samplesMs": [
+              1.6907,
+              2.3227,
+              2.0492,
+              1.7617,
+              1.4927,
+              1.8425,
+              1.9731,
+              1.7564,
+              1.6508,
+              1.4453,
+              0.9474,
+              1.9909,
+              1.2702,
+              1.4986,
+              1.2626,
+              3.4501,
+              2.2937,
+              1.9743,
+              1.7573,
+              1.7322
+            ],
+            "medianMs": 1.7569,
+            "p95Ms": 2.3227,
+            "minMs": 0.9474,
+            "maxMs": 3.4501
+          },
+          "scan": {
+            "samplesMs": [
+              36.3511,
+              43.563,
+              43.3114,
+              36.5742,
+              29.6429,
+              34.4639,
+              33.035,
+              35.4191,
+              34.2164,
+              31.046,
+              30.6154,
+              28.6887,
+              30.9891,
+              30.0589,
+              33.9824,
+              30.4079,
+              33.7721,
+              38.5936,
+              39.4319,
+              34.158
+            ],
+            "medianMs": 34.0702,
+            "p95Ms": 43.3114,
+            "minMs": 28.6887,
+            "maxMs": 43.563
+          },
+          "datasetRows": 30000,
+          "query": {
+            "place_id": 1,
+            "removed_at": null,
+            "kind": "review",
+            "_id": {
+              "$gt": 0
+            }
+          },
+          "projection": {
+            "_id": 1,
+            "rating": 1
+          },
+          "limit": 20,
+          "sort": {
+            "_id": 1
+          },
+          "indexedPlan": {
+            "returned": 20,
+            "keysExamined": 20,
+            "documentsExamined": 20,
+            "winningPlan": {
+              "isCached": false,
+              "stage": "LIMIT",
+              "limitAmount": 20,
+              "inputStage": {
+                "stage": "PROJECTION_SIMPLE",
+                "transformBy": {
+                  "_id": 1,
+                  "rating": 1
+                },
+                "inputStage": {
+                  "stage": "FETCH",
+                  "filter": {
+                    "removed_at": {
+                      "$eq": null
+                    }
+                  },
+                  "inputStage": {
+                    "stage": "IXSCAN",
+                    "keyPattern": {
+                      "place_id": 1,
+                      "removed_at": 1,
+                      "kind": 1,
+                      "_id": 1
+                    },
+                    "indexName": "place_feed",
+                    "isMultiKey": false,
+                    "multiKeyPaths": {
+                      "place_id": [],
+                      "removed_at": [],
+                      "kind": [],
+                      "_id": []
+                    },
+                    "isUnique": false,
+                    "isSparse": false,
+                    "isPartial": false,
+                    "indexVersion": 2,
+                    "direction": "forward",
+                    "indexBounds": {
+                      "place_id": [
+                        "[1, 1]"
+                      ],
+                      "removed_at": [
+                        "[null, null]"
+                      ],
+                      "kind": [
+                        "[\"review\", \"review\"]"
+                      ],
+                      "_id": [
+                        "(0, inf.0]"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "scanPlan": {
+            "returned": 20,
+            "keysExamined": 0,
+            "documentsExamined": 30000,
+            "winningPlan": {
+              "isCached": false,
+              "stage": "PROJECTION_SIMPLE",
+              "transformBy": {
+                "_id": 1,
+                "rating": 1
+              },
+              "inputStage": {
+                "stage": "SORT",
+                "sortPattern": {
+                  "_id": 1
+                },
+                "memLimit": 104857600,
+                "limitAmount": 20,
+                "type": "simple",
+                "inputStage": {
+                  "stage": "COLLSCAN",
+                  "filter": {
+                    "$and": [
+                      {
+                        "kind": {
+                          "$eq": "review"
+                        }
+                      },
+                      {
+                        "place_id": {
+                          "$eq": 1
+                        }
+                      },
+                      {
+                        "removed_at": {
+                          "$eq": null
+                        }
+                      },
+                      {
+                        "_id": {
+                          "$gt": 0
+                        }
+                      }
+                    ]
+                  },
+                  "direction": "forward"
+                }
+              }
+            }
+          },
+          "cache": "warm; no server cache flush"
+        }
+      }
+    }
+  ],
+  "limits": [
+    "No distributed ACID transaction across SQL and MongoDB.",
+    "Injected failures test application recovery; they are not power-loss, replica failover or backup-restore tests.",
+    "Benchmarks use a deterministic synthetic workload, warm caches and one host; timings are not a production capacity guarantee.",
+    "Content edits use last-write-wins; simultaneous edit conflict detection is not implemented.",
+    "A content POST interrupted after its MongoDB commit can have an ambiguous response; blindly retrying it may duplicate the post."
+  ]
+}

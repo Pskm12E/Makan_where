@@ -1,0 +1,30 @@
+{
+  "checkedAt": "2026-10-04T07:36:22.638610+00:00",
+  "origin": "https://makanwhere.4bytedigi.com",
+  "health": {
+    "status": "ok",
+    "service": "Makan Where",
+    "database": "connected",
+    "mongoDB": "connected"
+  },
+  "counts": {
+    "venues": 8421,
+    "photos": 8421,
+    "illustrativePhotos": 8421,
+    "websites": 1481,
+    "menuLinks": 267,
+    "phones": 1183,
+    "venuesWithDishes": 82,
+    "activeDishes": 7033,
+    "venuesWithMenuOrLink": 273
+  },
+  "kfc9": {
+    "menuItems": 97,
+    "price": 0.95,
+    "photoKind": "illustrative"
+  },
+  "unauthenticatedChecks": {
+    "/api/admin/menu-imports": 401,
+    "/api/integrations/menu-targets?name=KFC": 401
+  }
+}

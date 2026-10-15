@@ -1,5 +1,8 @@
-Flask==3.0.3
+Flask>=3.1.2,<4
 Flask-SQLAlchemy==3.1.1
-PyMySQL==1.1.1
-pymongo==4.8.0
-requests==2.32.3
+pymongo>=4.16,<5
+SQLAlchemy>=2.0.43,<2.1
+PyMySQL>=1.1.2,<2
+Flask-Limiter>=3.12,<5
+waitress>=3.0.2,<4
+gunicorn>=23.0.0,<24; sys_platform != 'win32'

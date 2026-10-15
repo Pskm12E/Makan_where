@@ -1,0 +1,37 @@
+name: makanwhere-coursework
+services:
+  mariadb:
+    image: mariadb:11.4
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?Generate private demo configuration first}
+      MARIADB_DATABASE: makanwhere_demo
+      MARIADB_USER: makanwhere
+      MARIADB_PASSWORD: ${MARIADB_APP_PASSWORD:?Generate private demo configuration first}
+    ports:
+      - "127.0.0.1:3308:3306"
+    volumes:
+      - sql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+  mongodb:
+    image: mongo:8.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: demo_bootstrap
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:?Generate private demo configuration first}
+      MONGO_APP_PASSWORD: ${MONGODB_APP_PASSWORD:?Generate private demo configuration first}
+    ports:
+      - "127.0.0.1:27018:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./database/mongo-init.js:/docker-entrypoint-initdb.d/10-application.js:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "quit(db.adminCommand({ping:1}).ok ? 0 : 1)"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+volumes:
+  sql_data:
+  mongo_data:

@@ -1,0 +1,12 @@
+Singapore food listing extract
+Copyright OpenStreetMap contributors.
+Source: https://www.openstreetmap.org/copyright
+Provider: https://download.geofabrik.de/asia/malaysia-singapore-brunei.html
+
+This normalised OpenStreetMap extract is made available under the Open Database
+License 1.0: https://opendatacommons.org/licenses/odbl/1-0/
+
+Collected 22 September 2026. Missing cells mean not supplied by the source.
+Community-maintained information may be incomplete or outdated.
+No menus, prices, ratings, reviews or venue photographs have been inferred.
+The CSV contains source identities and collection dates for each record.

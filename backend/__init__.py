@@ -1,0 +1,1 @@
+"""Makan Where application package."""

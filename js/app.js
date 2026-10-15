@@ -1,37 +1,48 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!await appReady) return;
   renderFeaturedEstablishments();
   renderPopularTags();
   bindHomeSearch();
+  document.getElementById('homePlaceCount').textContent = foodFinderData.length;
+  const rated = foodFinderData.filter(place => place.rating > 0);
+  document.getElementById('homeAverageRating').textContent = rated.length
+    ? (rated.reduce((sum, place) => sum + place.rating, 0) / rated.length).toFixed(1) + '/5' : 'No reviews';
+  document.getElementById('homeCuisineCount').textContent = new Set(foodFinderData.flatMap(place => place.cuisines)).size;
+  document.getElementById('popularItems').innerHTML = foodFinderData.filter(place => place.menu.some(item => item.availability)).slice(0, 3).map(place => {
+    const dish = place.menu.find(item => item.availability);
+    return dish ? `<article class="menu-item">${listingLabel(place)}<strong>${escapeHtml(dish.name)}</strong><p>${escapeHtml(place.name)} · ${priceLabel(dish.price)}</p><a class="small-action" href="restaurant.html?id=${place.id}">View menu</a></article>` : '';
+  }).join('');
 });
 
 function renderFeaturedEstablishments() {
   const container = document.getElementById('featuredGrid');
   if (!container) return;
 
-  const featured = [...foodFinderData].sort((a, b) => b.rating - a.rating).slice(0, 3);
+  const featured = [...foodFinderData].sort((a, b) => Number(a.isSample) - Number(b.isSample) || b.rating - a.rating || Number(a.address === 'Address not listed') - Number(b.address === 'Address not listed')).slice(0, 3);
   container.innerHTML = featured.map(establishment => `
     <article class="establishment-card">
-      <div class="card-image" style="background-image: linear-gradient(180deg, rgba(21, 20, 20, 0.05), rgba(21,20,20,0.38)), url('${establishment.image || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80'}');">
-        <span>${establishment.cuisine}</span>
+      <div class="card-image">
+        ${photoMarkup(establishment)}<span>${escapeHtml(establishment.cuisines.length ? establishment.cuisine : establishment.category)}</span>
       </div>
       <div class="card-body">
         <div class="card-meta">
-          <span class="tag">${establishment.category}</span>
-          <button class="icon-button" data-favourite="${establishment.id}" aria-label="Favourite ${establishment.name}">
+          <span class="tag">${escapeHtml(establishment.category)}</span>
+          ${listingLabel(establishment)}
+          <button class="icon-button" data-favourite="${establishment.id}" aria-label="Favourite ${escapeHtml(establishment.name)}">
             ${getFavouriteStatus(establishment.id) ? '♥' : '♡'}
           </button>
         </div>
-        <div class="establishment-name">${establishment.name}</div>
-        <div class="location-meta">${establishment.area} • ${establishment.address}</div>
+        <div class="establishment-name">${escapeHtml(establishment.name)}</div>
+        <div class="location-meta">${escapeHtml(establishment.area)} • ${escapeHtml(establishment.address)}</div>
         <div class="rating-row">
           <span class="star">★</span>
-          <span>${establishment.rating.toFixed(1)}</span>
+          <span>${ratingLabel(establishment.rating)}</span>
         </div>
         <div class="tag-row">
-          ${establishment.tags.slice(0, 3).map(tag => `<span class="tag">${tag}</span>`).join('')}
+          ${establishment.tags.slice(0, 3).map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
         </div>
         <div class="card-actions">
-          <span class="price-badge">From $${establishment.price.toFixed(2)}</span>
+          <span class="price-badge">${cataloguePrice(establishment)}</span>
           <a class="small-action" href="restaurant.html?id=${establishment.id}">View</a>
         </div>
       </div>
@@ -42,8 +53,7 @@ function renderFeaturedEstablishments() {
     button.addEventListener('click', (event) => {
       if (!requireLoginForFavourite()) return;
       const id = Number(event.currentTarget.dataset.favourite);
-      toggleFavourite(id);
-      renderFeaturedEstablishments();
+      withAction(event.currentTarget, async () => { await toggleFavourite(id); renderFeaturedEstablishments(); });
     });
   });
 }
@@ -52,8 +62,8 @@ function renderPopularTags() {
   const container = document.getElementById('homePopularTags');
   if (!container) return;
 
-  const tags = ['Chinese', 'Malay', 'Indian', 'Japanese', 'Vegetarian', 'Budget'];
-  container.innerHTML = tags.map(tag => `<button class="chip" data-tag="${tag}">${tag}</button>`).join('');
+  const tags = ['Chinese', 'Malay', 'Indian', 'Japanese', 'Coffee', 'Thai'];
+  container.innerHTML = tags.map(tag => `<button class="chip" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`).join('');
 
   container.querySelectorAll('[data-tag]').forEach(button => {
     button.addEventListener('click', () => {
@@ -76,22 +86,4 @@ function bindHomeSearch() {
   input.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') search();
   });
-}
-
-function getFavouriteStatus(id) {
-  if (!getCurrentUser()) return false;
-  const favourites = JSON.parse(localStorage.getItem(favouriteStorageKey) || '[]');
-  return favourites.includes(id);
-}
-
-function toggleFavourite(id) {
-  if (!requireLoginForFavourite()) return;
-  const favourites = JSON.parse(localStorage.getItem(favouriteStorageKey) || '[]');
-  const index = favourites.indexOf(id);
-  if (index >= 0) {
-    favourites.splice(index, 1);
-  } else {
-    favourites.push(id);
-  }
-  localStorage.setItem(favouriteStorageKey, JSON.stringify(favourites));
 }

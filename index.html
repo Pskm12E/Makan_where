@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/style.css?v=2d0c85c8c44b" />
   </head>
   <body>
     <header class="topbar">
@@ -22,6 +22,7 @@
           <a href="favourites.html">Favourites</a>
           <a href="admin.html">Admin</a>
           <a href="analytics.html">Analytics</a>
+          <a href="database-lab.html">Database evidence</a>
           <span id="authActions"></span>
         </nav>
       </div>
@@ -35,7 +36,7 @@
             <h1>Find great food near you across Singapore.</h1>
             <p class="subtitle">
               Explore hawker favourites, cafes, restaurants, and hidden gems by cuisine,
-              budget, hygiene grade, and neighbourhood.
+              budget and neighbourhood. Source coverage varies; sample listings include demonstration menus and community activity.
             </p>
             <div class="search-box">
               <input id="homeSearch" type="text" placeholder="Search by name, cuisine, or area" />
@@ -45,18 +46,25 @@
           </div>
           <div class="hero-card">
             <div class="mini-stat">
-              <strong>100+</strong>
+              <strong id="homePlaceCount">—</strong>
               <span>establishments</span>
             </div>
             <div class="mini-stat">
-              <strong>4.4/5</strong>
-              <span>avg. rating</span>
+              <strong id="homeAverageRating">—</strong>
+              <span>avg. place rating</span>
             </div>
             <div class="mini-stat">
-              <strong>6</strong>
+              <strong id="homeCuisineCount">—</strong>
               <span>cuisines</span>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container demo-discovery">
+          <div><p class="eyebrow">Try the populated application</p><h2>Menus, reviews and discussions ready to explore.</h2><p>Open a sample venue to test reviews, replies and favourites. Its generated content is labelled, and you can create your own account to try the features.</p></div>
+          <div class="content-actions"><a class="small-action" href="browse.html?dataset=demo">Explore sample venues</a><a class="secondary-btn" href="database-lab.html">Open database evidence</a></div>
         </div>
       </section>
 
@@ -73,7 +81,7 @@
       <section class="section alt-bg">
         <div class="container">
           <div class="section-heading">
-            <h2>Popular dishes</h2>
+            <h2>On the menu</h2>
           </div>
           <div id="popularItems" class="popular-items"></div>
         </div>
@@ -86,8 +94,8 @@
       </div>
     </footer>
 
-    <script src="js/auth.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/api.js?v=31aaa4aa5fa6"></script>
+    <script src="js/auth.js?v=3f3ce9f00478"></script>
+    <script src="js/app.js?v=428ba398a78f"></script>
   </body>
 </html>

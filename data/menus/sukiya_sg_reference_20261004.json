@@ -1,0 +1,62 @@
+{
+  "sourceName": "Suki-Ya Singapore official menu",
+  "sourceUrl": "https://www.suki-ya.com.sg/menu",
+  "observedAt": "2026-10-04T04:54:00Z",
+  "currency": "SGD",
+  "isReference": true,
+  "matchNames": [
+    "Suki-ya",
+    "Suki-Ya",
+    "SUKI-YA"
+  ],
+  "items": [
+    {
+      "sourceId": "regular-lunch-adult",
+      "name": "Regular Buffet Lunch — Adult",
+      "price": "23.90",
+      "description": "Published buffet reference price. Check the official menu for outlet availability, applicable days, service charge, GST and other conditions."
+    },
+    {
+      "sourceId": "regular-lunch-child",
+      "name": "Regular Buffet Lunch — Child (5–10 years)",
+      "price": "15.90",
+      "description": "Published buffet reference price. Check the official menu for outlet availability, applicable days, service charge, GST and other conditions."
+    },
+    {
+      "sourceId": "regular-dinner-adult",
+      "name": "Regular Buffet Dinner — Adult",
+      "price": "28.90",
+      "description": "Published buffet reference price. Check the official menu for outlet availability, applicable days, service charge, GST and other conditions."
+    },
+    {
+      "sourceId": "regular-dinner-child",
+      "name": "Regular Buffet Dinner — Child (5–10 years)",
+      "price": "18.90",
+      "description": "Published buffet reference price. Check the official menu for outlet availability, applicable days, service charge, GST and other conditions."
+    },
+    {
+      "sourceId": "premium-lunch-adult",
+      "name": "Premium Buffet Lunch — Adult",
+      "price": "36.90",
+      "description": "Published buffet reference price. Check the official menu for outlet availability, applicable days, service charge, GST and other conditions."
+    },
+    {
+      "sourceId": "premium-lunch-child",
+      "name": "Premium Buffet Lunch — Child (5–10 years)",
+      "price": "24.90",
+      "description": "Published buffet reference price. Check the official menu for outlet availability, applicable days, service charge, GST and other conditions."
+    },
+    {
+      "sourceId": "premium-dinner-adult",
+      "name": "Premium Buffet Dinner — Adult",
+      "price": "41.90",
+      "description": "Published buffet reference price. Check the official menu for outlet availability, applicable days, service charge, GST and other conditions."
+    },
+    {
+      "sourceId": "premium-dinner-child",
+      "name": "Premium Buffet Dinner — Child (5–10 years)",
+      "price": "29.90",
+      "description": "Published buffet reference price. Check the official menu for outlet availability, applicable days, service charge, GST and other conditions."
+    }
+  ]
+}

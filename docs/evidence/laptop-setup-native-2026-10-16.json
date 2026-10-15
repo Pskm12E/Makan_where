@@ -1,0 +1,73 @@
+{
+  "environment": "Native Windows portable MariaDB/MongoDB; NOT a Docker runtime test",
+  "runs": [
+    {
+      "run": 1,
+      "seconds": 43.825,
+      "counts": {
+        "sql": {
+          "area": 15,
+          "category": 5,
+          "cuisine": 212,
+          "place_cuisine": 5290,
+          "food_place": 8421,
+          "dish": 7034,
+          "user": 62,
+          "favourite": 120,
+          "content": 0,
+          "review": 0,
+          "thread": 0,
+          "comment": 0,
+          "content_dish": 0,
+          "upvote": 0,
+          "report": 0,
+          "discovery_event": 300,
+          "population_run": 4
+        },
+        "mongo": {
+          "content": 720,
+          "upvotes": 600,
+          "reports": 20
+        }
+      },
+      "integrityClean": true
+    },
+    {
+      "run": 2,
+      "seconds": 7.559,
+      "counts": {
+        "sql": {
+          "area": 15,
+          "category": 5,
+          "cuisine": 212,
+          "place_cuisine": 5290,
+          "food_place": 8421,
+          "dish": 7034,
+          "user": 62,
+          "favourite": 120,
+          "content": 0,
+          "review": 0,
+          "thread": 0,
+          "comment": 0,
+          "content_dish": 0,
+          "upvote": 0,
+          "report": 0,
+          "discovery_event": 300,
+          "population_run": 4
+        },
+        "mongo": {
+          "content": 720,
+          "upvotes": 600,
+          "reports": 20
+        }
+      },
+      "integrityClean": true
+    }
+  ],
+  "accountsVerified": [
+    "admin",
+    "user"
+  ],
+  "sameCountsAndHashesOnRerun": true,
+  "evaluationAccessVerified": true
+}

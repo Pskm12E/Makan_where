@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/style.css?v=2d0c85c8c44b" />
   </head>
   <body>
     <header class="topbar">
@@ -22,6 +22,7 @@
           <a href="favourites.html">Favourites</a>
           <a href="admin.html">Admin</a>
           <a href="analytics.html">Analytics</a>
+          <a href="database-lab.html">Database evidence</a>
           <span id="authActions"></span>
         </nav>
       </div>
@@ -30,6 +31,15 @@
     <main class="container page-shell">
       <aside class="filters-panel">
         <h2>Filters</h2>
+
+        <div class="filter-group">
+          <label for="datasetFilter">Listing source</label>
+          <select id="datasetFilter">
+            <option value="all">All listings</option>
+            <option value="real">Imported listings</option>
+            <option value="demo">Sample venues with demo activity</option>
+          </select>
+        </div>
 
         <div class="filter-group">
           <label for="searchInput">Search</label>
@@ -93,12 +103,14 @@
           <h1>Food spots in Singapore</h1>
           <span id="resultsCount" class="results-count"></span>
         </div>
+        <p id="datasetNotice" class="dataset-notice">Imported listings keep their original source details. Sample venues contain demonstration prices and community activity.</p>
         <div id="establishmentList" class="card-grid results-grid"></div>
+        <div id="browsePagination" class="content-actions" aria-label="Results pages"></div>
       </section>
     </main>
 
-    <script src="js/auth.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/browse.js"></script>
+    <script src="js/api.js?v=31aaa4aa5fa6"></script>
+    <script src="js/auth.js?v=3f3ce9f00478"></script>
+    <script src="js/browse.js?v=5fc7918caf1b"></script>
   </body>
 </html>

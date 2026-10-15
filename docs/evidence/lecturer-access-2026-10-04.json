@@ -1,0 +1,47 @@
+{
+  "checkedAt": "2026-10-04T16:14:30+08:00",
+  "release": "a8f205aec3849494",
+  "tests": {
+    "passed": 61,
+    "seconds": 105.59,
+    "engines": [
+      "MariaDB 10.11.14",
+      "MongoDB 8.0.19"
+    ]
+  },
+  "accounts": [
+    {
+      "username": "demo_lecturer",
+      "role": "admin",
+      "publicLogin": "passed",
+      "adminSchema": "allowed"
+    },
+    {
+      "username": "lecturer_user",
+      "role": "user",
+      "publicLogin": "passed",
+      "adminSchema": "denied",
+      "adminOnlyLogin": "denied"
+    }
+  ],
+  "normalUserFavouriteRoundtrip": "passed and restored",
+  "databaseAccess": {
+    "sql": "SQLAlchemy/PyMySQL via local Unix socket as makanwhere@localhost",
+    "mongo": "PyMongo via authenticated local Unix socket",
+    "runtimeDependsOnDBStudios": false,
+    "servicePrivateNetwork": true,
+    "serviceAddressFamilies": [
+      "AF_UNIX"
+    ],
+    "hostingNote": "Historical dbstudios SSH/tunnel names are shared hosting infrastructure, not database operations."
+  },
+  "legacyDBStudiosHelpersPackaged": false,
+  "browserChecks": [
+    "normal profile",
+    "admin dashboard",
+    "database evidence with both engine versions",
+    "corrected menu/example captions"
+  ],
+  "credentialsIncluded": false,
+  "reportEdited": false
+}

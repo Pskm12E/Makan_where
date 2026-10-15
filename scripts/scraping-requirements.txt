@@ -1,0 +1,3 @@
+# Local PBF fallback only; production does not need these libraries.
+osmium==4.3.1
+shapely==2.1.2

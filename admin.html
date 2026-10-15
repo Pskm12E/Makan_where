@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/style.css?v=2d0c85c8c44b" />
   </head>
   <body>
     <header class="topbar">
@@ -22,7 +22,7 @@
           <a href="favourites.html">Favourites</a>
           <a href="admin.html" class="active">Admin</a>
           <a href="analytics.html">Analytics</a>
-          <span id="authActions"></span>
+          <a href="database-lab.html">Database evidence</a><span id="authActions"></span>
         </nav>
       </div>
     </header>
@@ -30,45 +30,108 @@
     <main class="container admin-shell">
       <section class="content-panel">
         <div class="results-header">
-          <h1>Admin dashboard</h1>
+          <div><p class="eyebrow">Administration</p><h1>Manage Makan Where</h1><p>Maintain the catalogue, review reports and inspect your database structure.</p></div>
         </div>
+        <nav class="admin-tabs" aria-label="Administration sections">
+          <button type="button" data-admin-panel="catalogue" aria-pressed="true">Catalogue</button>
+          <button type="button" data-admin-panel="imports" aria-pressed="false">Import menus</button>
+          <button type="button" data-admin-panel="reports" aria-pressed="false">Moderation</button>
+          <button type="button" data-admin-panel="schema" aria-pressed="false">Database schema</button>
+        </nav>
+        <p id="adminNotice" class="form-notice success" role="status" hidden></p>
 
-        <div class="admin-grid">
-          <div class="admin-card">
-            <h3 id="adminFormTitle">Add establishment</h3>
-            <form id="adminForm" class="admin-form">
-              <input type="hidden" id="editId" value="" />
-              <input type="text" id="adminName" placeholder="Establishment name" required />
-              <input type="text" id="adminArea" placeholder="Area" required />
-              <input type="text" id="adminCategory" placeholder="Category" required />
-              <input type="text" id="adminCuisine" placeholder="Cuisine" required />
-              <input type="text" id="adminAddress" placeholder="Address" required />
-              <div class="admin-form-actions">
-                <button type="submit" id="adminSubmitBtn">Add establishment</button>
-                <button type="button" id="cancelEditBtn" class="secondary-btn hidden">Cancel</button>
-              </div>
+        <section id="panel-catalogue" aria-label="Catalogue management">
+          <div class="admin-grid">
+            <div class="admin-card">
+              <h2 id="adminFormTitle">Add establishment</h2>
+              <form id="adminForm" class="admin-form">
+                <input type="hidden" id="editId" value="" />
+                <label>Name<input type="text" id="adminName" maxlength="150" required /></label>
+                <label>Area<input type="text" id="adminArea" maxlength="100" required /></label>
+                <label>Category<input type="text" id="adminCategory" maxlength="100" required /></label>
+                <label>Cuisines <small>(comma-separated; leave blank if unknown)</small><input type="text" id="adminCuisine" maxlength="500" /></label>
+                <label>Address<input type="text" id="adminAddress" maxlength="255" /></label>
+                <details class="listing-editor"><summary>Photos, links and venue details</summary>
+                  <label>Description<textarea id="adminDescription" maxlength="2000" rows="3"></textarea></label>
+                  <label>Opening hours<input id="adminOpeningHours" maxlength="1000" /></label>
+                  <label>Website URL<input id="adminWebsite" type="url" maxlength="1000" /></label>
+                  <label>Menu URL<input id="adminMenuUrl" type="url" maxlength="1000" /></label>
+                  <label>Business phone<input id="adminPhone" maxlength="100" /></label>
+                  <label>Photo URL <small>Unsplash, Wikimedia or a file under /assets/. Leave blank for a cuisine photo.</small><input id="adminImage" maxlength="1000" /></label>
+                  <label>Photo type<select id="adminPhotoKind"><option value="illustrative">Illustrative photo</option><option value="venue">Actual venue photo</option></select></label>
+                  <label>Photo source link<input id="adminPhotoSourceUrl" type="url" maxlength="1000" /></label>
+                  <label>Photo credit / licence<input id="adminPhotoCredit" maxlength="100" /></label>
+                  <img id="adminPhotoPreview" class="admin-photo-preview" alt="Current listing photo" hidden />
+                </details>
+                <div class="admin-form-actions">
+                  <button type="submit" id="adminSubmitBtn">Add establishment</button>
+                  <button type="button" id="cancelEditBtn" class="secondary-btn" hidden>Cancel edit</button>
+                </div>
+              </form>
+            </div>
+            <div class="admin-card stats-card">
+              <h2>Catalogue overview</h2>
+              <div class="mini-stat-block"><strong id="statsCount">0</strong><span>active establishments</span></div>
+              <div class="mini-stat-block"><strong id="statsAvgPrice">—</strong><span>average listed item price</span></div>
+              <div class="mini-stat-block"><strong id="statsMenus">—</strong><span>establishments with a menu</span></div>
+              <div class="mini-stat-block"><strong id="statsPhotos">—</strong><span>listings with photos (including illustrative)</span></div>
+              <div class="mini-stat-block"><strong id="statsLinks">—</strong><span>listings with a menu or source menu link</span></div>
+              <p>Archive a place to remove it from discovery while retaining its reviews and favourites.</p>
+            </div>
+          </div>
+
+          <section id="adminMenuPanel" class="admin-card admin-menu-panel" hidden aria-label="Menu management">
+            <div class="results-header"><h2 id="adminMenuTitle">Manage menu</h2><button type="button" id="closeMenuBtn" class="secondary-btn">Close menu</button></div>
+            <p>Removing a dish hides it from the public menu and preserves past review links. You can restore it here.</p>
+            <div id="adminDishes" class="admin-list"></div>
+            <h3 id="dishFormTitle">Add dish</h3>
+            <form id="adminDishForm" class="admin-form">
+              <input type="hidden" id="editDishId" />
+              <label>Dish name<input id="dishName" maxlength="150" required /></label>
+              <label>Price (SGD)<input id="dishPrice" type="number" min="0" max="99999999" step="0.01" required /></label>
+              <label>Dietary information<input id="dishDietary" maxlength="80" /></label>
+              <label>Description<textarea id="dishDescription" maxlength="1000" rows="3"></textarea></label>
+              <div class="admin-form-actions"><button type="submit" id="saveDishBtn">Add dish</button><button type="button" id="cancelDishBtn" class="secondary-btn" hidden>Cancel edit</button></div>
             </form>
-          </div>
+          </section>
 
-          <div class="admin-card stats-card">
-            <h3>Quick stats</h3>
-            <div class="mini-stat-block">
-              <strong id="statsCount">0</strong>
-              <span>establishments</span>
-            </div>
-            <div class="mini-stat-block">
-              <strong id="statsAvgPrice">$0</strong>
-              <span>avg. menu price</span>
-            </div>
+          <div class="admin-toolbar">
+            <label>Find an establishment<input type="search" id="adminSearch" placeholder="Search name, area, cuisine or address" /></label>
+            <label>Menu coverage<select id="adminMenuFilter"><option value="all">All establishments</option><option value="missing">Missing menu</option><option value="available">Has menu</option><option value="reference">Chain reference menu</option></select></label>
+            <p id="adminPageInfo" role="status"></p>
           </div>
-        </div>
+          <div id="adminEstablishments" class="admin-list"></div>
+          <div class="admin-pagination"><button id="adminPrevious" type="button" class="secondary-btn">Previous</button><button id="adminNext" type="button" class="secondary-btn">Next</button></div>
+        </section>
 
-        <div id="adminEstablishments" class="admin-list"></div>
+        <section id="panel-imports" hidden aria-label="Menu imports">
+          <h2>Import sourced menus</h2>
+          <p>Preview dish names, SGD prices and the exact establishments before importing. Existing dishes, administrator edits and removed items are preserved.</p>
+          <p id="menuImportStatus" role="status"></p>
+          <div class="admin-form-actions"><button type="button" id="loadKfcMenu" class="secondary-btn">Load KFC reference menu</button><label class="secondary-btn">Choose menu JSON<input type="file" id="menuImportFile" accept=".json,application/json" /></label></div>
+          <p>The KFC source contains 97 published items observed on 4 October 2026. It is a chain reference, not a complete or outlet-confirmed menu.</p>
+          <form id="menuImportForm" class="admin-form">
+            <label>Menu JSON<textarea id="menuImportJson" rows="12" spellcheck="false" required placeholder="Choose a JSON file, load the KFC reference, or use Import menu beside an establishment."></textarea></label>
+            <div class="admin-form-actions"><button type="submit" id="previewMenuImport">Preview import</button><button type="button" id="applyMenuImport" disabled>Import previewed dishes</button></div>
+          </form>
+          <div id="menuImportPreview" aria-live="polite"></div>
+          <h3>Recent imports</h3><div id="menuImportHistory"></div>
+        </section>
+
+        <section id="panel-reports" hidden aria-label="Content moderation"><div id="moderationReports"></div></section>
+
+        <section id="panel-schema" hidden aria-label="Database schema">
+          <div class="results-header"><div><h2>Database schema</h2><p>Read-only structure from the connected database. Select a table to inspect its columns and relationships.</p></div><button id="refreshSchemaBtn" class="secondary-btn" type="button">Refresh schema</button></div>
+          <div id="schemaSummary" class="schema-summary"></div>
+          <p class="schema-plan"><strong>MongoDB: active.</strong> Community collections, validators and indexes are shown in the <a href="database-lab.html">Database evidence</a>.</p>
+          <label class="schema-search">Find a table or column<input type="search" id="schemaSearch" placeholder="For example: food_place or place_id" /></label>
+          <div id="schemaTables" class="schema-tables" aria-live="polite"></div>
+        </section>
       </section>
     </main>
 
-    <script src="js/auth.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/admin.js"></script>
+    <script src="js/api.js?v=31aaa4aa5fa6"></script>
+    <script src="js/auth.js?v=3f3ce9f00478"></script>
+    <script src="js/admin.js?v=7f233faae9be"></script>
   </body>
 </html>

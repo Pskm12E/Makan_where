@@ -1,0 +1,38 @@
+{
+  "burger": {
+    "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1000&q=80",
+    "credit": "amirali mirhashemian / Unsplash",
+    "sourceUrl": "https://unsplash.com/photos/burger-with-lettuce-and-tomatoes-sc5sTPMrVfk",
+    "alt": "Burger with lettuce and tomato"
+  },
+  "japanese": {
+    "image": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1000&q=80",
+    "credit": "Unsplash",
+    "sourceUrl": "https://unsplash.com/license",
+    "alt": "A plate of sushi"
+  },
+  "curry": {
+    "image": "https://images.unsplash.com/photo-1618449840665-9ed506d73a34?auto=format&fit=crop&w=1000&q=80",
+    "credit": "Bruna Branco / Unsplash",
+    "sourceUrl": "https://unsplash.com/photos/black-ceramic-bowl-with-soup-0wn-DdavPa4",
+    "alt": "A bowl of curry"
+  },
+  "coffee": {
+    "image": "https://images.unsplash.com/photo-1573682451889-3c728e6107fc?auto=format&fit=crop&w=1000&q=80",
+    "credit": "Sixteen Miles Out / Unsplash",
+    "sourceUrl": "https://unsplash.com/photos/coffee-cup-rQRd2sgR0uo",
+    "alt": "A cup of coffee"
+  },
+  "vegetarian": {
+    "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1000&q=80",
+    "credit": "Unsplash",
+    "sourceUrl": "https://unsplash.com/license",
+    "alt": "An illustrative salad photograph"
+  },
+  "food": {
+    "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80",
+    "credit": "Unsplash",
+    "sourceUrl": "https://unsplash.com/license",
+    "alt": "An illustrative food photograph"
+  }
+}

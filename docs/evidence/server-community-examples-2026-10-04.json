@@ -1,0 +1,61 @@
+{
+  "checkedAt": "2026-10-04T07:54:37.266678+00:00",
+  "release": "77d931deeec7ea3c",
+  "health": {
+    "status": "ok",
+    "service": "Makan Where",
+    "database": "connected",
+    "mongoDB": "connected"
+  },
+  "places": [
+    {
+      "placeId": 9,
+      "name": "KFC",
+      "counts": {
+        "review": 3,
+        "thread": 2,
+        "comment": 4
+      },
+      "rating": 0.0
+    },
+    {
+      "placeId": 10,
+      "name": "McDonald's",
+      "counts": {
+        "review": 3,
+        "thread": 2,
+        "comment": 4
+      },
+      "rating": 0.0
+    },
+    {
+      "placeId": 14,
+      "name": "McDonald's",
+      "counts": {
+        "review": 3,
+        "thread": 2,
+        "comment": 4
+      },
+      "rating": 0.0
+    },
+    {
+      "placeId": 15,
+      "name": "Suki-ya",
+      "counts": {
+        "review": 3,
+        "thread": 2,
+        "comment": 4
+      },
+      "rating": 0.0
+    }
+  ],
+  "reviews": 12,
+  "threads": 8,
+  "replies": 16,
+  "allLabelled": true,
+  "ratingsUnchanged": true,
+  "testsPassed": 61,
+  "testSeconds": 112.33,
+  "repeatPreviewAdded": 0,
+  "referenceAudit": "passed"
+}

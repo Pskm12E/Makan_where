@@ -1,0 +1,126 @@
+{
+  "release": "/srv/makanwhere/releases/11a89bf538af436a",
+  "sqlVersion": "10.11.14-MariaDB-0ubuntu0.24.04.1",
+  "mongoVersion": "8.0.19",
+  "constraintProbes": [
+    {
+      "check": "PRIMARY KEY: duplicate area_id",
+      "passed": true,
+      "result": "Database rejected the write with error code 1062.",
+      "errorType": "IntegrityError"
+    },
+    {
+      "check": "UNIQUE: duplicate area name",
+      "passed": true,
+      "result": "Database rejected the write with error code 1062.",
+      "errorType": "IntegrityError"
+    },
+    {
+      "check": "FOREIGN KEY: dish with missing place",
+      "passed": true,
+      "result": "Database rejected the write with error code 1452.",
+      "errorType": "IntegrityError"
+    },
+    {
+      "check": "CHECK: negative dish price",
+      "passed": true,
+      "result": "Database rejected the write with error code 4025.",
+      "errorType": "OperationalError"
+    },
+    {
+      "check": "NOT NULL: area name",
+      "passed": true,
+      "result": "Database rejected the write with error code 1048.",
+      "errorType": "IntegrityError"
+    },
+    {
+      "check": "MongoDB _id unique",
+      "passed": true,
+      "result": "MongoDB error code 11000; expected 11000."
+    },
+    {
+      "check": "MongoDB review rating 1\u20135",
+      "passed": true,
+      "result": "MongoDB error code 121; expected 121."
+    },
+    {
+      "check": "MongoDB subtype needs rating",
+      "passed": true,
+      "result": "MongoDB error code 121; expected 121."
+    },
+    {
+      "check": "MongoDB compound unique vote",
+      "passed": true,
+      "result": "Duplicate (user_id, content_id) rejected."
+    }
+  ],
+  "audit": {
+    "sqlForeignKeys": [
+      {
+        "reference": "discovery_event \u2192 user",
+        "orphans": 0
+      },
+      {
+        "reference": "discovery_event \u2192 food_place",
+        "orphans": 0
+      },
+      {
+        "reference": "dish \u2192 food_place",
+        "orphans": 0
+      },
+      {
+        "reference": "favourite \u2192 food_place",
+        "orphans": 0
+      },
+      {
+        "reference": "favourite \u2192 user",
+        "orphans": 0
+      },
+      {
+        "reference": "food_place \u2192 category",
+        "orphans": 0
+      },
+      {
+        "reference": "food_place \u2192 area",
+        "orphans": 0
+      },
+      {
+        "reference": "place_cuisine \u2192 food_place",
+        "orphans": 0
+      },
+      {
+        "reference": "place_cuisine \u2192 cuisine",
+        "orphans": 0
+      }
+    ],
+    "mongoReferences": {
+      "authors": 0,
+      "places": 0,
+      "dishLinks": 0,
+      "threadLinks": 0,
+      "votes": 0,
+      "reports": 0
+    },
+    "duplicateSourceIdentities": 0,
+    "duplicateVoteGroups": 0
+  },
+  "adminMenuStatus": {
+    "adminAccountConfigured": false,
+    "authenticatedUiCheck": "pending administrator account",
+    "apiConfigured": true,
+    "venues": 8421,
+    "withMenu": 82,
+    "importHistory": [
+      {
+        "source": "Suki-Ya Singapore official menu",
+        "added": 32,
+        "actor": "integration"
+      },
+      {
+        "source": "KFC Singapore official menu",
+        "added": 6984,
+        "actor": "integration"
+      }
+    ]
+  }
+}

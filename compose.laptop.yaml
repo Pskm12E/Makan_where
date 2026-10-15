@@ -1,0 +1,110 @@
+name: makanwhere-laptop
+
+x-app-environment: &app-environment
+  DATABASE_URL: mysql+pymysql://makanwhere:${MARIADB_APP_PASSWORD:?Run configure_laptop.py first}@mariadb:3306/makanwhere_demo?charset=utf8mb4
+  MONGODB_URI: mongodb://makanwhere:${MONGODB_APP_PASSWORD:?Run configure_laptop.py first}@mongodb:27017/makanwhere_demo?authSource=makanwhere_demo
+  MONGODB_DATABASE: makanwhere_demo
+  SECRET_KEY: ${SECRET_KEY:?Run configure_laptop.py first}
+  PASSWORD_PEPPER: ${PASSWORD_PEPPER:?Run configure_laptop.py first}
+  COOKIE_SECURE: "false"
+  TRUST_PROXY: "false"
+  TRUSTED_HOSTS: localhost,127.0.0.1
+  DATABASE_EVALUATION_FILE: /evidence/database-evaluation.json
+
+services:
+  mariadb:
+    image: mariadb:11.4
+    environment:
+      MARIADB_DATABASE: makanwhere_demo
+      MARIADB_USER: makanwhere
+      MARIADB_PASSWORD: ${MARIADB_APP_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?Run configure_laptop.py first}
+    volumes: [sql_data:/var/lib/mysql]
+    healthcheck: &sql-health
+      test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+    restart: unless-stopped
+  mongodb:
+    image: mongo:8.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: bootstrap
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:?Run configure_laptop.py first}
+      MONGO_APP_PASSWORD: ${MONGODB_APP_PASSWORD}
+    volumes:
+      - mongo_data:/data/db
+      - ./database/mongo-init.js:/docker-entrypoint-initdb.d/10-application.js:ro
+    healthcheck: &mongo-health
+      test: [CMD, mongosh, --quiet, --eval, "quit(db.adminCommand({ping:1}).ok ? 0 : 1)"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+    restart: unless-stopped
+  setup:
+    image: makanwhere-laptop:local
+    build:
+      context: .
+      target: runtime
+    environment:
+      <<: *app-environment
+      LECTURER_ADMIN_USERNAME: ${LECTURER_ADMIN_USERNAME}
+      LECTURER_ADMIN_PASSWORD: ${LECTURER_ADMIN_PASSWORD}
+      LECTURER_USER_USERNAME: ${LECTURER_USER_USERNAME}
+      LECTURER_USER_PASSWORD: ${LECTURER_USER_PASSWORD}
+    depends_on:
+      mariadb: {condition: service_healthy}
+      mongodb: {condition: service_healthy}
+    command: [python, scripts/laptop_setup.py]
+    restart: "no"
+  app:
+    image: makanwhere-laptop:local
+    build:
+      context: .
+      target: runtime
+    environment: *app-environment
+    ports: ["127.0.0.1:${APP_PORT:-5056}:5055"]
+    volumes: [evidence:/evidence:ro]
+    depends_on:
+      setup: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5055/api/health', timeout=4)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  # These two engines are exclusively for disposable evaluation databases.
+  # No app database volume, credentials or host port is shared with them.
+  test-sql:
+    profiles: [evaluation]
+    image: mariadb:11.4
+    environment:
+      MARIADB_ROOT_PASSWORD: ${TEST_SQL_PASSWORD:?Run configure_laptop.py first}
+      MARIADB_ROOT_HOST: "%"
+    healthcheck: *sql-health
+  test-mongo:
+    profiles: [evaluation]
+    image: mongo:8.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: evaluation
+      MONGO_INITDB_ROOT_PASSWORD: ${TEST_MONGO_PASSWORD:?Run configure_laptop.py first}
+    healthcheck: *mongo-health
+  evaluate:
+    profiles: [evaluation]
+    image: makanwhere-evaluation:local
+    build:
+      context: .
+      target: evaluation
+    environment:
+      MARIADB_TEST_ADMIN_URL: mysql+pymysql://root:${TEST_SQL_PASSWORD}@test-sql:3306/mysql?charset=utf8mb4
+      MONGODB_TEST_URI: mongodb://evaluation:${TEST_MONGO_PASSWORD}@test-mongo:27017/admin?authSource=admin
+    depends_on:
+      test-sql: {condition: service_healthy}
+      test-mongo: {condition: service_healthy}
+    volumes: [evidence:/evidence]
+
+volumes:
+  sql_data:
+  mongo_data:
+  evidence:

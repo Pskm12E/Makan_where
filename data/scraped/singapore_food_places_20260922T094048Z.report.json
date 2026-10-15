@@ -1,0 +1,72 @@
+{
+  "source": "OpenStreetMap",
+  "licence": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "attribution": "© OpenStreetMap contributors",
+  "query": "Geofabrik PBF: named restaurant/cafe/fast_food/food_court within the SG admin_level=2 boundary",
+  "fetched_at": "2026-09-22T09:39:56.417679+00:00",
+  "raw_snapshot": "data\\scraped\\singapore_osm_20260922T093956Z.json",
+  "csv": "data\\scraped\\singapore_food_places_20260922T094048Z.csv",
+  "sha256": "80db589d7a486154810b953f37185b3b7502b10d7ad9fa57c2891ff76444b36f",
+  "source_elements": 8427,
+  "rows": 8415,
+  "with_address": 4220,
+  "with_cuisine": 4330,
+  "with_area": 9,
+  "rejected": [
+    {
+      "source_id": "node/2620554404",
+      "reason": "field exceeds application limit"
+    }
+  ],
+  "duplicates": [
+    {
+      "source_id": "node/4985903223",
+      "kept": "node/4968450821"
+    },
+    {
+      "source_id": "node/6976881386",
+      "kept": "node/6975908102"
+    },
+    {
+      "source_id": "node/6976881485",
+      "kept": "node/6975908105"
+    },
+    {
+      "source_id": "node/6976881586",
+      "kept": "node/6975908599"
+    },
+    {
+      "source_id": "node/6976881688",
+      "kept": "node/6975908688"
+    },
+    {
+      "source_id": "node/8512907669",
+      "kept": "node/8447601682"
+    },
+    {
+      "source_id": "node/12499323598",
+      "kept": "node/12498391788"
+    },
+    {
+      "source_id": "node/12499323599",
+      "kept": "node/12498391789"
+    },
+    {
+      "source_id": "way/117227115",
+      "kept": "node/1699416855"
+    },
+    {
+      "source_id": "way/172904473",
+      "kept": "node/13800122117"
+    },
+    {
+      "source_id": "way/668443001",
+      "kept": "node/9393513455"
+    }
+  ],
+  "notes": [
+    "Blank means not supplied by the source. No prices, ratings, menus or photos are inferred.",
+    "Street-address duplicates within 15 metres are collapsed; different branches/units remain.",
+    "Spreadsheet formula prefixes are escaped with an apostrophe in CSV text cells."
+  ]
+}

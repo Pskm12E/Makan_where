@@ -1,0 +1,273 @@
+{
+  "capturedAt": "2026-09-28T02:35:44.827648+00:00",
+  "engine": "sqlite",
+  "databaseVersion": "3.50.4",
+  "sqlalchemyVersion": "2.0.54",
+  "scope": "Read-only plans and results; not a performance benchmark. MongoDB is not implemented.",
+  "rowCounts": {
+    "area": 15,
+    "category": 5,
+    "comment": 0,
+    "content": 0,
+    "content_dish": 0,
+    "cuisine": 212,
+    "discovery_event": 0,
+    "dish": 18,
+    "favourite": 0,
+    "food_place": 8421,
+    "place_cuisine": 5290,
+    "report": 0,
+    "review": 0,
+    "thread": 0,
+    "upvote": 0,
+    "user": 0
+  },
+  "queries": [
+    {
+      "name": "topRated",
+      "sql": "SELECT food_place.place_id AS id, food_place.place_name AS name, avg(review.rating) AS rating, count(review.content_id) AS \"reviewCount\" \nFROM food_place JOIN content ON content.place_id = food_place.place_id JOIN review ON review.content_id = content.content_id \nWHERE food_place.archived_at IS NULL AND content.removed_at IS NULL GROUP BY food_place.place_id, food_place.place_name ORDER BY avg(review.rating) DESC, count(review.content_id) DESC, food_place.place_id\n LIMIT 3 OFFSET 0",
+      "plan": [
+        {
+          "id": 13,
+          "parent": 0,
+          "notused": 216,
+          "detail": "SCAN content"
+        },
+        {
+          "id": 17,
+          "parent": 0,
+          "notused": 45,
+          "detail": "SEARCH review USING INTEGER PRIMARY KEY (rowid=?)"
+        },
+        {
+          "id": 20,
+          "parent": 0,
+          "notused": 45,
+          "detail": "SEARCH food_place USING INTEGER PRIMARY KEY (rowid=?)"
+        },
+        {
+          "id": 25,
+          "parent": 0,
+          "notused": 0,
+          "detail": "USE TEMP B-TREE FOR GROUP BY"
+        },
+        {
+          "id": 75,
+          "parent": 0,
+          "notused": 0,
+          "detail": "USE TEMP B-TREE FOR ORDER BY"
+        }
+      ],
+      "result": []
+    },
+    {
+      "name": "mostFavourited",
+      "sql": "SELECT food_place.place_id AS id, food_place.place_name AS name, count(favourite.user_id) AS \"favouriteCount\" \nFROM food_place JOIN favourite ON favourite.place_id = food_place.place_id \nWHERE food_place.archived_at IS NULL GROUP BY food_place.place_id, food_place.place_name ORDER BY count(favourite.user_id) DESC, food_place.place_id\n LIMIT 3 OFFSET 0",
+      "plan": [
+        {
+          "id": 12,
+          "parent": 0,
+          "notused": 214,
+          "detail": "SCAN favourite USING COVERING INDEX sqlite_autoindex_favourite_1"
+        },
+        {
+          "id": 14,
+          "parent": 0,
+          "notused": 45,
+          "detail": "SEARCH food_place USING INTEGER PRIMARY KEY (rowid=?)"
+        },
+        {
+          "id": 19,
+          "parent": 0,
+          "notused": 0,
+          "detail": "USE TEMP B-TREE FOR GROUP BY"
+        },
+        {
+          "id": 65,
+          "parent": 0,
+          "notused": 0,
+          "detail": "USE TEMP B-TREE FOR ORDER BY"
+        }
+      ],
+      "result": []
+    },
+    {
+      "name": "cuisineCoverage",
+      "sql": "SELECT cuisine.cuisine_name AS name, count(distinct(food_place.place_id)) AS \"venueCount\" \nFROM cuisine JOIN place_cuisine ON place_cuisine.cuisine_id = cuisine.cuisine_id JOIN food_place ON food_place.place_id = place_cuisine.place_id \nWHERE food_place.archived_at IS NULL GROUP BY cuisine.cuisine_id, cuisine.cuisine_name ORDER BY count(distinct(food_place.place_id)) DESC, cuisine.cuisine_name, cuisine.cuisine_id\n LIMIT 3 OFFSET 0",
+      "plan": [
+        {
+          "id": 13,
+          "parent": 0,
+          "notused": 216,
+          "detail": "SCAN place_cuisine"
+        },
+        {
+          "id": 15,
+          "parent": 0,
+          "notused": 45,
+          "detail": "SEARCH cuisine USING INTEGER PRIMARY KEY (rowid=?)"
+        },
+        {
+          "id": 18,
+          "parent": 0,
+          "notused": 45,
+          "detail": "SEARCH food_place USING INTEGER PRIMARY KEY (rowid=?)"
+        },
+        {
+          "id": 23,
+          "parent": 0,
+          "notused": 0,
+          "detail": "USE TEMP B-TREE FOR GROUP BY"
+        },
+        {
+          "id": 70,
+          "parent": 0,
+          "notused": 0,
+          "detail": "USE TEMP B-TREE FOR count(DISTINCT)"
+        },
+        {
+          "id": 73,
+          "parent": 0,
+          "notused": 0,
+          "detail": "USE TEMP B-TREE FOR ORDER BY"
+        }
+      ],
+      "result": [
+        {
+          "name": "Coffee",
+          "venueCount": 643
+        },
+        {
+          "name": "Chinese",
+          "venueCount": 585
+        },
+        {
+          "name": "Japanese",
+          "venueCount": 362
+        }
+      ]
+    },
+    {
+      "name": "affordableItems",
+      "sql": "SELECT dish.dish_id AS id, dish.dish_name AS name, dish.price, food_place.place_name AS place, food_place.place_id AS \"placeId\", food_place.is_sample AS \"isSample\" \nFROM dish JOIN food_place ON food_place.place_id = dish.place_id \nWHERE food_place.archived_at IS NULL AND dish.is_available IS 1 ORDER BY dish.price, dish.dish_id\n LIMIT 3 OFFSET 0",
+      "plan": [
+        {
+          "id": 8,
+          "parent": 0,
+          "notused": 216,
+          "detail": "SCAN dish"
+        },
+        {
+          "id": 12,
+          "parent": 0,
+          "notused": 45,
+          "detail": "SEARCH food_place USING INTEGER PRIMARY KEY (rowid=?)"
+        },
+        {
+          "id": 31,
+          "parent": 0,
+          "notused": 0,
+          "detail": "USE TEMP B-TREE FOR ORDER BY"
+        }
+      ],
+      "result": [
+        {
+          "id": 15,
+          "name": "Masala Tea",
+          "price": 2.5,
+          "place": "Tekka Market Stall 12",
+          "placeId": 5,
+          "isSample": true
+        },
+        {
+          "id": 6,
+          "name": "Bandung Soda",
+          "price": 3.5,
+          "place": "Rasa Utara",
+          "placeId": 2,
+          "isSample": true
+        },
+        {
+          "id": 2,
+          "name": "Char Siew Rice",
+          "price": 5.0,
+          "place": "Hawker Chan",
+          "placeId": 1,
+          "isSample": true
+        }
+      ]
+    },
+    {
+      "name": "affordableMenus",
+      "sql": "SELECT food_place.place_id AS id, food_place.place_name AS name, avg(dish.price) AS \"averagePrice\", count(dish.dish_id) AS \"dishCount\", food_place.is_sample AS \"isSample\" \nFROM food_place JOIN dish ON dish.place_id = food_place.place_id \nWHERE food_place.archived_at IS NULL AND dish.is_available IS 1 GROUP BY food_place.place_id, food_place.place_name, food_place.is_sample \nHAVING avg(dish.price) <= 12.00 ORDER BY avg(dish.price), food_place.place_id\n LIMIT 3 OFFSET 0",
+      "plan": [
+        {
+          "id": 12,
+          "parent": 0,
+          "notused": 216,
+          "detail": "SCAN dish"
+        },
+        {
+          "id": 16,
+          "parent": 0,
+          "notused": 45,
+          "detail": "SEARCH food_place USING INTEGER PRIMARY KEY (rowid=?)"
+        },
+        {
+          "id": 21,
+          "parent": 0,
+          "notused": 0,
+          "detail": "USE TEMP B-TREE FOR GROUP BY"
+        },
+        {
+          "id": 77,
+          "parent": 0,
+          "notused": 0,
+          "detail": "USE TEMP B-TREE FOR ORDER BY"
+        }
+      ],
+      "result": [
+        {
+          "id": 5,
+          "name": "Tekka Market Stall 12",
+          "averagePrice": 5.333333333333333,
+          "dishCount": 3,
+          "isSample": true
+        },
+        {
+          "id": 1,
+          "name": "Hawker Chan",
+          "averagePrice": 5.5,
+          "dishCount": 3,
+          "isSample": true
+        },
+        {
+          "id": 2,
+          "name": "Rasa Utara",
+          "averagePrice": 8.0,
+          "dishCount": 3,
+          "isSample": true
+        }
+      ]
+    },
+    {
+      "name": "discovery",
+      "sql": "SELECT discovery_event.event_type AS type, count(*) AS count \nFROM discovery_event GROUP BY discovery_event.event_type ORDER BY discovery_event.event_type",
+      "plan": [
+        {
+          "id": 7,
+          "parent": 0,
+          "notused": 216,
+          "detail": "SCAN discovery_event"
+        },
+        {
+          "id": 9,
+          "parent": 0,
+          "notused": 0,
+          "detail": "USE TEMP B-TREE FOR GROUP BY"
+        }
+      ],
+      "result": []
+    }
+  ]
+}

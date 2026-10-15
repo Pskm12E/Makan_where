@@ -1,0 +1,705 @@
+{
+  "status": "proposed design validated in isolation; not a live migration",
+  "generatedAt": "2026-10-06T11:38:22.642827+00:00",
+  "checks": [
+    {
+      "check": "BCNF of the three menu relations under declared FDs",
+      "passed": true,
+      "observed": [
+        {
+          "relation": "menu_publication",
+          "attributes": [
+            "publication_id",
+            "source_name",
+            "source_url",
+            "observed_at",
+            "payload_sha256",
+            "is_reference"
+          ],
+          "candidateKeys": [
+            [
+              "payload_sha256"
+            ],
+            [
+              "publication_id"
+            ]
+          ],
+          "bcnfViolations": []
+        },
+        {
+          "relation": "menu_entry",
+          "attributes": [
+            "publication_id",
+            "source_item_id",
+            "item_name",
+            "description",
+            "reference_price",
+            "dietary_label"
+          ],
+          "candidateKeys": [
+            [
+              "publication_id",
+              "source_item_id"
+            ]
+          ],
+          "bcnfViolations": []
+        },
+        {
+          "relation": "outlet_offering",
+          "attributes": [
+            "offering_id",
+            "place_id",
+            "publication_id",
+            "source_item_id",
+            "is_available",
+            "price_override",
+            "name_override",
+            "description_override",
+            "dietary_override"
+          ],
+          "candidateKeys": [
+            [
+              "offering_id"
+            ],
+            [
+              "place_id",
+              "publication_id",
+              "source_item_id"
+            ]
+          ],
+          "bcnfViolations": []
+        }
+      ]
+    },
+    {
+      "check": "Both decomposition steps are lossless",
+      "passed": true,
+      "observed": [
+        {
+          "intersection": [
+            "publication_id"
+          ],
+          "determines": "menu_publication",
+          "proved": true
+        },
+        {
+          "intersection": [
+            "publication_id",
+            "source_item_id"
+          ],
+          "determines": "menu_entry",
+          "proved": true
+        }
+      ]
+    },
+    {
+      "check": "All declared FDs are preserved",
+      "passed": true,
+      "observed": true
+    },
+    {
+      "check": "Reconstruct all original offering rows with no spurious tuples",
+      "passed": true,
+      "observed": {
+        "before": 7016,
+        "after": 7016,
+        "fieldsCompared": [
+          "dish_id",
+          "place_id",
+          "dish_name",
+          "description",
+          "effective_price",
+          "dietary_label",
+          "is_available",
+          "source_name",
+          "source_item_id",
+          "source_url",
+          "observed_at",
+          "is_reference"
+        ]
+      }
+    },
+    {
+      "check": "Shared menu facts stored once",
+      "passed": true,
+      "observed": {
+        "publications": 2,
+        "entries": 105,
+        "offeringRelationships": 7016,
+        "oldCopiedItemPayloads": 7016
+      }
+    },
+    {
+      "check": "Outlet override is local and zero remains a valid price",
+      "passed": true,
+      "observed": {
+        "firstPrice": 0,
+        "nextOutletPrice": 9.95
+      }
+    },
+    {
+      "check": "New publication retains old facts, IDs and overrides",
+      "passed": true,
+      "observed": {
+        "stableOfferingIds": 7016,
+        "oldEntriesRetained": 97,
+        "overrideRetained": true
+      }
+    },
+    {
+      "check": "Multivalued tags are separate relationship tuples",
+      "passed": true,
+      "observed": {
+        "place": 1,
+        "tagRows": 2
+      }
+    },
+    {
+      "check": "Entry needs a publication parent",
+      "passed": true,
+      "observed": "Database rejected the invalid tuple; transaction rolled back"
+    },
+    {
+      "check": "Composite FK rejects an item from a different edition",
+      "passed": true,
+      "observed": "Database rejected the invalid tuple; transaction rolled back"
+    },
+    {
+      "check": "One offering per outlet and entry",
+      "passed": true,
+      "observed": "Database rejected the invalid tuple; transaction rolled back"
+    },
+    {
+      "check": "Negative price override rejected",
+      "passed": true,
+      "observed": "Database rejected the invalid tuple; transaction rolled back"
+    },
+    {
+      "check": "Referenced publication cannot be physically deleted",
+      "passed": true,
+      "observed": "Database rejected the invalid tuple; transaction rolled back"
+    },
+    {
+      "check": "Duplicate tag relationship rejected",
+      "passed": true,
+      "observed": "Database rejected the invalid tuple; transaction rolled back"
+    },
+    {
+      "check": "Duplicate publication fingerprint rejected",
+      "passed": true,
+      "observed": "Database rejected the invalid tuple; transaction rolled back"
+    },
+    {
+      "check": "ISA subtype is disjoint",
+      "passed": true,
+      "observed": {
+        "mongoCode": 121
+      }
+    },
+    {
+      "check": "ISA subtype is covering",
+      "passed": true,
+      "observed": {
+        "mongoCode": 121
+      }
+    },
+    {
+      "check": "Embedded feedback is bounded",
+      "passed": true,
+      "observed": {
+        "mongoCode": 121
+      }
+    },
+    {
+      "check": "Mongo vote relationship is unique",
+      "passed": true,
+      "observed": {
+        "storedVotes": 1
+      }
+    }
+  ],
+  "formal": {
+    "assumptions": "Publication ID identifies one sourced observation; entry ID is local to that publication; outlet overrides are separate facts; one offering per outlet/entry.",
+    "fds": [
+      {
+        "left": [
+          "publication_id"
+        ],
+        "right": [
+          "source_name",
+          "source_url",
+          "observed_at",
+          "payload_sha256",
+          "is_reference"
+        ]
+      },
+      {
+        "left": [
+          "payload_sha256"
+        ],
+        "right": [
+          "publication_id"
+        ]
+      },
+      {
+        "left": [
+          "publication_id",
+          "source_item_id"
+        ],
+        "right": [
+          "item_name",
+          "description",
+          "reference_price",
+          "dietary_label"
+        ]
+      },
+      {
+        "left": [
+          "offering_id"
+        ],
+        "right": [
+          "place_id",
+          "publication_id",
+          "source_item_id",
+          "is_available",
+          "price_override",
+          "name_override",
+          "description_override",
+          "dietary_override"
+        ]
+      },
+      {
+        "left": [
+          "place_id",
+          "publication_id",
+          "source_item_id"
+        ],
+        "right": [
+          "offering_id"
+        ]
+      }
+    ],
+    "parts": [
+      {
+        "relation": "menu_publication",
+        "attributes": [
+          "publication_id",
+          "source_name",
+          "source_url",
+          "observed_at",
+          "payload_sha256",
+          "is_reference"
+        ],
+        "candidateKeys": [
+          [
+            "payload_sha256"
+          ],
+          [
+            "publication_id"
+          ]
+        ],
+        "bcnfViolations": []
+      },
+      {
+        "relation": "menu_entry",
+        "attributes": [
+          "publication_id",
+          "source_item_id",
+          "item_name",
+          "description",
+          "reference_price",
+          "dietary_label"
+        ],
+        "candidateKeys": [
+          [
+            "publication_id",
+            "source_item_id"
+          ]
+        ],
+        "bcnfViolations": []
+      },
+      {
+        "relation": "outlet_offering",
+        "attributes": [
+          "offering_id",
+          "place_id",
+          "publication_id",
+          "source_item_id",
+          "is_available",
+          "price_override",
+          "name_override",
+          "description_override",
+          "dietary_override"
+        ],
+        "candidateKeys": [
+          [
+            "offering_id"
+          ],
+          [
+            "place_id",
+            "publication_id",
+            "source_item_id"
+          ]
+        ],
+        "bcnfViolations": []
+      }
+    ],
+    "closureExamples": [
+      {
+        "start": [
+          "publication_id"
+        ],
+        "result": [
+          "is_reference",
+          "observed_at",
+          "payload_sha256",
+          "publication_id",
+          "source_name",
+          "source_url"
+        ],
+        "steps": [
+          {
+            "using": "publication_id \u2192 source_name, source_url, observed_at, payload_sha256, is_reference",
+            "added": [
+              "is_reference",
+              "observed_at",
+              "payload_sha256",
+              "source_name",
+              "source_url"
+            ],
+            "closure": [
+              "is_reference",
+              "observed_at",
+              "payload_sha256",
+              "publication_id",
+              "source_name",
+              "source_url"
+            ]
+          }
+        ]
+      },
+      {
+        "start": [
+          "publication_id",
+          "source_item_id"
+        ],
+        "result": [
+          "description",
+          "dietary_label",
+          "is_reference",
+          "item_name",
+          "observed_at",
+          "payload_sha256",
+          "publication_id",
+          "reference_price",
+          "source_item_id",
+          "source_name",
+          "source_url"
+        ],
+        "steps": [
+          {
+            "using": "publication_id \u2192 source_name, source_url, observed_at, payload_sha256, is_reference",
+            "added": [
+              "is_reference",
+              "observed_at",
+              "payload_sha256",
+              "source_name",
+              "source_url"
+            ],
+            "closure": [
+              "is_reference",
+              "observed_at",
+              "payload_sha256",
+              "publication_id",
+              "source_item_id",
+              "source_name",
+              "source_url"
+            ]
+          },
+          {
+            "using": "publication_id, source_item_id \u2192 item_name, description, reference_price, dietary_label",
+            "added": [
+              "description",
+              "dietary_label",
+              "item_name",
+              "reference_price"
+            ],
+            "closure": [
+              "description",
+              "dietary_label",
+              "is_reference",
+              "item_name",
+              "observed_at",
+              "payload_sha256",
+              "publication_id",
+              "reference_price",
+              "source_item_id",
+              "source_name",
+              "source_url"
+            ]
+          }
+        ]
+      },
+      {
+        "start": [
+          "offering_id"
+        ],
+        "result": [
+          "description",
+          "description_override",
+          "dietary_label",
+          "dietary_override",
+          "is_available",
+          "is_reference",
+          "item_name",
+          "name_override",
+          "observed_at",
+          "offering_id",
+          "payload_sha256",
+          "place_id",
+          "price_override",
+          "publication_id",
+          "reference_price",
+          "source_item_id",
+          "source_name",
+          "source_url"
+        ],
+        "steps": [
+          {
+            "using": "offering_id \u2192 place_id, publication_id, source_item_id, is_available, price_override, name_override, description_override, dietary_override",
+            "added": [
+              "description_override",
+              "dietary_override",
+              "is_available",
+              "name_override",
+              "place_id",
+              "price_override",
+              "publication_id",
+              "source_item_id"
+            ],
+            "closure": [
+              "description_override",
+              "dietary_override",
+              "is_available",
+              "name_override",
+              "offering_id",
+              "place_id",
+              "price_override",
+              "publication_id",
+              "source_item_id"
+            ]
+          },
+          {
+            "using": "publication_id \u2192 source_name, source_url, observed_at, payload_sha256, is_reference",
+            "added": [
+              "is_reference",
+              "observed_at",
+              "payload_sha256",
+              "source_name",
+              "source_url"
+            ],
+            "closure": [
+              "description_override",
+              "dietary_override",
+              "is_available",
+              "is_reference",
+              "name_override",
+              "observed_at",
+              "offering_id",
+              "payload_sha256",
+              "place_id",
+              "price_override",
+              "publication_id",
+              "source_item_id",
+              "source_name",
+              "source_url"
+            ]
+          },
+          {
+            "using": "publication_id, source_item_id \u2192 item_name, description, reference_price, dietary_label",
+            "added": [
+              "description",
+              "dietary_label",
+              "item_name",
+              "reference_price"
+            ],
+            "closure": [
+              "description",
+              "description_override",
+              "dietary_label",
+              "dietary_override",
+              "is_available",
+              "is_reference",
+              "item_name",
+              "name_override",
+              "observed_at",
+              "offering_id",
+              "payload_sha256",
+              "place_id",
+              "price_override",
+              "publication_id",
+              "reference_price",
+              "source_item_id",
+              "source_name",
+              "source_url"
+            ]
+          }
+        ]
+      },
+      {
+        "start": [
+          "place_id",
+          "publication_id",
+          "source_item_id"
+        ],
+        "result": [
+          "description",
+          "description_override",
+          "dietary_label",
+          "dietary_override",
+          "is_available",
+          "is_reference",
+          "item_name",
+          "name_override",
+          "observed_at",
+          "offering_id",
+          "payload_sha256",
+          "place_id",
+          "price_override",
+          "publication_id",
+          "reference_price",
+          "source_item_id",
+          "source_name",
+          "source_url"
+        ],
+        "steps": [
+          {
+            "using": "publication_id \u2192 source_name, source_url, observed_at, payload_sha256, is_reference",
+            "added": [
+              "is_reference",
+              "observed_at",
+              "payload_sha256",
+              "source_name",
+              "source_url"
+            ],
+            "closure": [
+              "is_reference",
+              "observed_at",
+              "payload_sha256",
+              "place_id",
+              "publication_id",
+              "source_item_id",
+              "source_name",
+              "source_url"
+            ]
+          },
+          {
+            "using": "publication_id, source_item_id \u2192 item_name, description, reference_price, dietary_label",
+            "added": [
+              "description",
+              "dietary_label",
+              "item_name",
+              "reference_price"
+            ],
+            "closure": [
+              "description",
+              "dietary_label",
+              "is_reference",
+              "item_name",
+              "observed_at",
+              "payload_sha256",
+              "place_id",
+              "publication_id",
+              "reference_price",
+              "source_item_id",
+              "source_name",
+              "source_url"
+            ]
+          },
+          {
+            "using": "place_id, publication_id, source_item_id \u2192 offering_id",
+            "added": [
+              "offering_id"
+            ],
+            "closure": [
+              "description",
+              "dietary_label",
+              "is_reference",
+              "item_name",
+              "observed_at",
+              "offering_id",
+              "payload_sha256",
+              "place_id",
+              "publication_id",
+              "reference_price",
+              "source_item_id",
+              "source_name",
+              "source_url"
+            ]
+          },
+          {
+            "using": "offering_id \u2192 place_id, publication_id, source_item_id, is_available, price_override, name_override, description_override, dietary_override",
+            "added": [
+              "description_override",
+              "dietary_override",
+              "is_available",
+              "name_override",
+              "price_override"
+            ],
+            "closure": [
+              "description",
+              "description_override",
+              "dietary_label",
+              "dietary_override",
+              "is_available",
+              "is_reference",
+              "item_name",
+              "name_override",
+              "observed_at",
+              "offering_id",
+              "payload_sha256",
+              "place_id",
+              "price_override",
+              "publication_id",
+              "reference_price",
+              "source_item_id",
+              "source_name",
+              "source_url"
+            ]
+          }
+        ]
+      }
+    ],
+    "losslessSplits": [
+      {
+        "intersection": [
+          "publication_id"
+        ],
+        "determines": "menu_publication",
+        "proved": true
+      },
+      {
+        "intersection": [
+          "publication_id",
+          "source_item_id"
+        ],
+        "determines": "menu_entry",
+        "proved": true
+      }
+    ],
+    "dependencyPreserved": true,
+    "qualification": "BCNF is relative to these declared semantic FDs. Optional SQL values are interpreted under the stated override domains; the key/FD proof does not validate all existing application tables or JSON documents."
+  },
+  "sourceSha256": {
+    "database/design_v2.py": "22086db6b1e7801b7e3f867287d9674c1ba70758d80ee077615f435a229b96f7",
+    "scripts/verify_design_v2.py": "f3bd78bdf6a9bcd30a6895c6691dc45d66b1a4dbc483d03881a281f6b14b345b",
+    "backend/course_evidence.py": "2de2819187472c79fc17b775f34ee382ccd91975fe315870fad746fb21277bb9",
+    "backend/mongo.py": "162fae961c3af0a81af7544f2725a39c44ebfd7ac6ea1640d7f8aaba546ec006",
+    "data/menus/kfc_sg_reference_20261004.json": "4e978f1edfa0de038741a817417b63441373b20c5d581dcba70407a2ec2fe439",
+    "data/menus/sukiya_sg_reference_20261004.json": "a63b20613b10d9cb858e8721f9178c259c9760871f8463b0bbdd4fb2641312ef"
+  },
+  "sqlVersion": "3.50.4",
+  "ddlSha256": "d5c4b17646a6701c5ddb54aa2c9d06e60c7a2c0b22c00a21f9932c89edd4bec7",
+  "mongoVersion": "8.0.19",
+  "passed": true
+}

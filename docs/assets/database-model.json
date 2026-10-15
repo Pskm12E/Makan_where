@@ -1,0 +1,1636 @@
+{
+  "source": "SQLAlchemy declarations, MongoDB validators and application write paths; no database connection",
+  "tables": [
+    {
+      "name": "area",
+      "role": "live",
+      "columns": [
+        {
+          "name": "area_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "area_name",
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": true
+        }
+      ],
+      "primary_key": [
+        "area_id"
+      ],
+      "unique": [
+        [
+          "area_name"
+        ]
+      ],
+      "foreign_keys": [],
+      "checks": [],
+      "indexes": []
+    },
+    {
+      "name": "category",
+      "role": "live",
+      "columns": [
+        {
+          "name": "category_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "category_name",
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": true
+        }
+      ],
+      "primary_key": [
+        "category_id"
+      ],
+      "unique": [
+        [
+          "category_name"
+        ]
+      ],
+      "foreign_keys": [],
+      "checks": [],
+      "indexes": []
+    },
+    {
+      "name": "cuisine",
+      "role": "live",
+      "columns": [
+        {
+          "name": "cuisine_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "cuisine_name",
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": true
+        }
+      ],
+      "primary_key": [
+        "cuisine_id"
+      ],
+      "unique": [
+        [
+          "cuisine_name"
+        ]
+      ],
+      "foreign_keys": [],
+      "checks": [],
+      "indexes": []
+    },
+    {
+      "name": "population_run",
+      "role": "live",
+      "columns": [
+        {
+          "name": "run_key",
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "pk": true,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "details",
+          "type": "JSON",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "run_key"
+      ],
+      "unique": [],
+      "foreign_keys": [],
+      "checks": [],
+      "indexes": []
+    },
+    {
+      "name": "user",
+      "role": "live",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "display_name",
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "email",
+          "type": "VARCHAR(254)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": true
+        },
+        {
+          "name": "password_hash",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "role",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "username",
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": true
+        },
+        {
+          "name": "phone",
+          "type": "VARCHAR(25)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "user_id"
+      ],
+      "unique": [
+        [
+          "email"
+        ],
+        [
+          "username"
+        ]
+      ],
+      "foreign_keys": [],
+      "checks": [
+        "role IN ('user', 'admin')"
+      ],
+      "indexes": []
+    },
+    {
+      "name": "food_place",
+      "role": "live",
+      "columns": [
+        {
+          "name": "place_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "area_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": false,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "category_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": false,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "place_name",
+          "type": "VARCHAR(150)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "address",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "latitude",
+          "type": "NUMERIC(9, 6)",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "longitude",
+          "type": "NUMERIC(9, 6)",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "google_place_id",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": true
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "image_url",
+          "type": "VARCHAR(1000)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "enrichment",
+          "type": "JSON",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "hygiene_grade",
+          "type": "VARCHAR(1)",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "tags",
+          "type": "JSON",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "archived_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "source_name",
+          "type": "VARCHAR(40)",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "source_id",
+          "type": "VARCHAR(80)",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "source_url",
+          "type": "VARCHAR(500)",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "source_fetched_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "opening_hours",
+          "type": "VARCHAR(1000)",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "is_sample",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "place_id"
+      ],
+      "unique": [
+        [
+          "google_place_id"
+        ],
+        [
+          "source_name",
+          "source_id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "area_id"
+          ],
+          "parent": "area",
+          "targets": [
+            "area_id"
+          ],
+          "nullable": false
+        },
+        {
+          "columns": [
+            "category_id"
+          ],
+          "parent": "category",
+          "targets": [
+            "category_id"
+          ],
+          "nullable": false
+        }
+      ],
+      "checks": [],
+      "indexes": [
+        {
+          "name": "ix_food_place_area_id",
+          "columns": [
+            "area_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "ix_food_place_place_name",
+          "columns": [
+            "place_name"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "name": "content",
+      "role": "legacy migration source",
+      "columns": [
+        {
+          "name": "content_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "author_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": false,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "place_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": false,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "body",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "removed_by_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "pk": false,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "removed_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "kind",
+          "type": "VARCHAR(10)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "content_id"
+      ],
+      "unique": [
+        [
+          "content_id",
+          "kind"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "place_id"
+          ],
+          "parent": "food_place",
+          "targets": [
+            "place_id"
+          ],
+          "nullable": false
+        },
+        {
+          "columns": [
+            "author_id"
+          ],
+          "parent": "user",
+          "targets": [
+            "user_id"
+          ],
+          "nullable": false
+        },
+        {
+          "columns": [
+            "removed_by_id"
+          ],
+          "parent": "user",
+          "targets": [
+            "user_id"
+          ],
+          "nullable": true
+        }
+      ],
+      "checks": [
+        "(removed_at IS NULL AND removed_by_id IS NULL) OR (removed_at IS NOT NULL AND removed_by_id IS NOT NULL)",
+        "kind IN ('review','thread','comment')"
+      ],
+      "indexes": [
+        {
+          "name": "ix_content_author_id",
+          "columns": [
+            "author_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "ix_content_place_id",
+          "columns": [
+            "place_id"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "name": "discovery_event",
+      "role": "live",
+      "columns": [
+        {
+          "name": "event_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "user_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "pk": false,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "place_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "pk": false,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "event_type",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "occurred_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "event_id"
+      ],
+      "unique": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "place_id"
+          ],
+          "parent": "food_place",
+          "targets": [
+            "place_id"
+          ],
+          "nullable": true
+        },
+        {
+          "columns": [
+            "user_id"
+          ],
+          "parent": "user",
+          "targets": [
+            "user_id"
+          ],
+          "nullable": true
+        }
+      ],
+      "checks": [
+        "event_type != 'place_view' OR place_id IS NOT NULL",
+        "event_type IN ('search','place_view')"
+      ],
+      "indexes": [
+        {
+          "name": "ix_discovery_event_occurred_at",
+          "columns": [
+            "occurred_at"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "name": "dish",
+      "role": "live",
+      "columns": [
+        {
+          "name": "dish_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "place_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": false,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "dish_name",
+          "type": "VARCHAR(150)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "price",
+          "type": "NUMERIC(10, 2)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "is_available",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "dietary_label",
+          "type": "VARCHAR(80)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "source_name",
+          "type": "VARCHAR(80)",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "source_item_id",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "source_url",
+          "type": "VARCHAR(500)",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "source_observed_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "is_reference",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "dish_id"
+      ],
+      "unique": [
+        [
+          "place_id",
+          "source_name",
+          "source_item_id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "place_id"
+          ],
+          "parent": "food_place",
+          "targets": [
+            "place_id"
+          ],
+          "nullable": false
+        }
+      ],
+      "checks": [
+        "price >= 0"
+      ],
+      "indexes": [
+        {
+          "name": "ix_dish_place_id",
+          "columns": [
+            "place_id"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "name": "favourite",
+      "role": "live",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "place_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "saved_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "user_id",
+        "place_id"
+      ],
+      "unique": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "place_id"
+          ],
+          "parent": "food_place",
+          "targets": [
+            "place_id"
+          ],
+          "nullable": false
+        },
+        {
+          "columns": [
+            "user_id"
+          ],
+          "parent": "user",
+          "targets": [
+            "user_id"
+          ],
+          "nullable": false
+        }
+      ],
+      "checks": [],
+      "indexes": []
+    },
+    {
+      "name": "place_cuisine",
+      "role": "live",
+      "columns": [
+        {
+          "name": "place_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "cuisine_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": true,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "place_id",
+        "cuisine_id"
+      ],
+      "unique": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cuisine_id"
+          ],
+          "parent": "cuisine",
+          "targets": [
+            "cuisine_id"
+          ],
+          "nullable": false
+        },
+        {
+          "columns": [
+            "place_id"
+          ],
+          "parent": "food_place",
+          "targets": [
+            "place_id"
+          ],
+          "nullable": false
+        }
+      ],
+      "checks": [],
+      "indexes": []
+    },
+    {
+      "name": "content_dish",
+      "role": "legacy migration source",
+      "columns": [
+        {
+          "name": "content_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "dish_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "dish_feedback",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "content_id",
+        "dish_id"
+      ],
+      "unique": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "content_id"
+          ],
+          "parent": "content",
+          "targets": [
+            "content_id"
+          ],
+          "nullable": false
+        },
+        {
+          "columns": [
+            "dish_id"
+          ],
+          "parent": "dish",
+          "targets": [
+            "dish_id"
+          ],
+          "nullable": false
+        }
+      ],
+      "checks": [],
+      "indexes": []
+    },
+    {
+      "name": "report",
+      "role": "legacy migration source",
+      "columns": [
+        {
+          "name": "report_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "reporter_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": false,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "content_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": false,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "reason",
+          "type": "VARCHAR(1000)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "resolved_by_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "pk": false,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "resolved_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "resolution_note",
+          "type": "VARCHAR(1000)",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "report_id"
+      ],
+      "unique": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "content_id"
+          ],
+          "parent": "content",
+          "targets": [
+            "content_id"
+          ],
+          "nullable": false
+        },
+        {
+          "columns": [
+            "reporter_id"
+          ],
+          "parent": "user",
+          "targets": [
+            "user_id"
+          ],
+          "nullable": false
+        },
+        {
+          "columns": [
+            "resolved_by_id"
+          ],
+          "parent": "user",
+          "targets": [
+            "user_id"
+          ],
+          "nullable": true
+        }
+      ],
+      "checks": [
+        "status IN ('open','resolved','dismissed')"
+      ],
+      "indexes": [
+        {
+          "name": "ix_report_content_id",
+          "columns": [
+            "content_id"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "name": "review",
+      "role": "legacy migration source",
+      "columns": [
+        {
+          "name": "content_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "kind",
+          "type": "VARCHAR(10)",
+          "nullable": false,
+          "pk": false,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "rating",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR(150)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "content_id"
+      ],
+      "unique": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "content_id",
+            "kind"
+          ],
+          "parent": "content",
+          "targets": [
+            "content_id",
+            "kind"
+          ],
+          "nullable": false
+        }
+      ],
+      "checks": [
+        "kind = 'review'",
+        "rating BETWEEN 1 AND 5"
+      ],
+      "indexes": []
+    },
+    {
+      "name": "thread",
+      "role": "legacy migration source",
+      "columns": [
+        {
+          "name": "content_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "kind",
+          "type": "VARCHAR(10)",
+          "nullable": false,
+          "pk": false,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR(150)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "content_id"
+      ],
+      "unique": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "content_id",
+            "kind"
+          ],
+          "parent": "content",
+          "targets": [
+            "content_id",
+            "kind"
+          ],
+          "nullable": false
+        }
+      ],
+      "checks": [
+        "kind = 'thread'"
+      ],
+      "indexes": []
+    },
+    {
+      "name": "upvote",
+      "role": "legacy migration source",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "content_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "voted_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "user_id",
+        "content_id"
+      ],
+      "unique": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "content_id"
+          ],
+          "parent": "content",
+          "targets": [
+            "content_id"
+          ],
+          "nullable": false
+        },
+        {
+          "columns": [
+            "user_id"
+          ],
+          "parent": "user",
+          "targets": [
+            "user_id"
+          ],
+          "nullable": false
+        }
+      ],
+      "checks": [],
+      "indexes": []
+    },
+    {
+      "name": "comment",
+      "role": "legacy migration source",
+      "columns": [
+        {
+          "name": "content_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "kind",
+          "type": "VARCHAR(10)",
+          "nullable": false,
+          "pk": false,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "thread_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": false,
+          "fk": true,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "content_id"
+      ],
+      "unique": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "content_id",
+            "kind"
+          ],
+          "parent": "content",
+          "targets": [
+            "content_id",
+            "kind"
+          ],
+          "nullable": false
+        },
+        {
+          "columns": [
+            "thread_id"
+          ],
+          "parent": "thread",
+          "targets": [
+            "content_id"
+          ],
+          "nullable": false
+        }
+      ],
+      "checks": [
+        "kind = 'comment'"
+      ],
+      "indexes": [
+        {
+          "name": "ix_comment_thread_id",
+          "columns": [
+            "thread_id"
+          ],
+          "unique": false
+        }
+      ]
+    }
+  ],
+  "view": {
+    "name": "catalogue_menu_summary",
+    "query": "SELECT p.place_id, p.place_name, COUNT(d.dish_id) AS available_dishes,\nMIN(d.price) AS starting_price, AVG(d.price) AS average_price\nFROM food_place p LEFT JOIN dish d ON d.place_id = p.place_id AND d.is_available = 1\nWHERE p.archived_at IS NULL GROUP BY p.place_id, p.place_name"
+  },
+  "mongo_validators": {
+    "content": {
+      "$and": [
+        {
+          "$jsonSchema": {
+            "bsonType": "object",
+            "required": [
+              "_id",
+              "kind",
+              "author_id",
+              "place_id",
+              "body",
+              "created_at",
+              "updated_at",
+              "removed_at",
+              "dishes"
+            ],
+            "properties": {
+              "_id": {
+                "bsonType": [
+                  "int",
+                  "long"
+                ],
+                "minimum": 1
+              },
+              "author_id": {
+                "bsonType": [
+                  "int",
+                  "long"
+                ],
+                "minimum": 1
+              },
+              "place_id": {
+                "bsonType": [
+                  "int",
+                  "long"
+                ],
+                "minimum": 1
+              },
+              "kind": {
+                "enum": [
+                  "review",
+                  "thread",
+                  "comment"
+                ]
+              },
+              "body": {
+                "bsonType": "string",
+                "minLength": 1,
+                "maxLength": 5000
+              },
+              "title": {
+                "bsonType": "string",
+                "maxLength": 150
+              },
+              "rating": {
+                "bsonType": "int",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "thread_id": {
+                "bsonType": [
+                  "int",
+                  "long"
+                ],
+                "minimum": 1
+              },
+              "created_at": {
+                "bsonType": "date"
+              },
+              "updated_at": {
+                "bsonType": "date"
+              },
+              "removed_at": {
+                "bsonType": [
+                  "date",
+                  "null"
+                ]
+              },
+              "removed_by_id": {
+                "bsonType": [
+                  "int",
+                  "long",
+                  "null"
+                ]
+              },
+              "is_demo": {
+                "bsonType": "bool"
+              },
+              "dishes": {
+                "bsonType": "array",
+                "maxItems": 20,
+                "items": {
+                  "bsonType": "object",
+                  "required": [
+                    "dish_id",
+                    "feedback"
+                  ],
+                  "properties": {
+                    "dish_id": {
+                      "bsonType": [
+                        "int",
+                        "long"
+                      ],
+                      "minimum": 1
+                    },
+                    "feedback": {
+                      "bsonType": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 1000
+                    }
+                  }
+                }
+              }
+            },
+            "oneOf": [
+              {
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "review"
+                    ]
+                  }
+                },
+                "required": [
+                  "rating",
+                  "title"
+                ],
+                "not": {
+                  "required": [
+                    "thread_id"
+                  ]
+                }
+              },
+              {
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "thread"
+                    ]
+                  }
+                },
+                "required": [
+                  "title"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "rating"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "thread_id"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "comment"
+                    ]
+                  }
+                },
+                "required": [
+                  "thread_id"
+                ],
+                "not": {
+                  "required": [
+                    "rating"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "$or": [
+            {
+              "removed_at": null,
+              "removed_by_id": null
+            },
+            {
+              "removed_at": {
+                "$type": "date"
+              },
+              "removed_by_id": {
+                "$type": [
+                  "int",
+                  "long"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "upvotes": {
+      "$jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "user_id",
+          "content_id",
+          "voted_at"
+        ],
+        "properties": {
+          "user_id": {
+            "bsonType": [
+              "int",
+              "long"
+            ],
+            "minimum": 1
+          },
+          "content_id": {
+            "bsonType": [
+              "int",
+              "long"
+            ],
+            "minimum": 1
+          },
+          "voted_at": {
+            "bsonType": "date"
+          }
+        }
+      }
+    },
+    "reports": {
+      "$jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "reporter_id",
+          "content_id",
+          "reason",
+          "status",
+          "created_at"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": [
+              "int",
+              "long"
+            ],
+            "minimum": 1
+          },
+          "reporter_id": {
+            "bsonType": [
+              "int",
+              "long"
+            ],
+            "minimum": 1
+          },
+          "content_id": {
+            "bsonType": [
+              "int",
+              "long"
+            ],
+            "minimum": 1
+          },
+          "reason": {
+            "bsonType": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "status": {
+            "enum": [
+              "open",
+              "resolved",
+              "dismissed"
+            ]
+          },
+          "created_at": {
+            "bsonType": "date"
+          }
+        }
+      }
+    }
+  },
+  "mongo_collections": [
+    "content",
+    "upvotes",
+    "reports",
+    "counters",
+    "population_runs"
+  ]
+}
