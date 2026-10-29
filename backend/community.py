@@ -1,5 +1,9 @@
 """Live MongoDB CRUD, with SQL reference checks and bounded embedded feedback."""
+import hashlib
+import json
+import re
 from flask import abort, g, jsonify, request
+from pymongo.errors import DuplicateKeyError
 from sqlalchemy import select
 from .models import db, User, FoodPlace, Dish, now
 from .mongo import community_db, next_id
@@ -50,12 +54,20 @@ def serialize(items):
     return [{"id": c["_id"], "kind": c["kind"], "authorId": c["author_id"], "establishmentId": c["place_id"],
         "reviewer": users.get(c["author_id"], "Unavailable account"), "text": c["body"], "title": c.get("title", ""),
         "rating": c.get("rating"), "threadId": c.get("thread_id"), "createdAt": c["created_at"].isoformat() + "Z",
+        "revision": c.get('revision', 1),
         "isDemo": c.get("is_demo", False), "isExample": c.get("is_example", False), "tags": [], "upvoteCount": votes.get(c["_id"], 0), "upvoted": c["_id"] in own,
         "dishes": [{"id": d["dish_id"], "name": dishes.get(d["dish_id"], "Unavailable dish"), "feedback": d["feedback"]} for d in c["dishes"]]
     } for c in items]
 
 
 def register_community(app, limiter):
+    @app.get('/api/content/<int:content_id>')
+    def get_content(content_id):
+        item = visible(content_id)
+        response = jsonify(content=serialize([item])[0])
+        response.set_etag(str(item.get('revision', 1)))
+        return response
+
     @app.get("/api/reviews")
     @app.get("/api/content")
     def list_content():
@@ -84,6 +96,16 @@ def register_community(app, limiter):
     @limiter.limit("20 per hour")
     def create_content():
         data = payload()
+        key = request.headers.get('Idempotency-Key', '')
+        if not re.fullmatch(r'[A-Za-z0-9_-]{16,128}', key):
+            abort(400, 'Supply an Idempotency-Key of 16–128 letters, digits, dashes or underscores. Reuse it only when retrying this post.')
+        request_hash = hashlib.sha256(json.dumps({'route': request.path, 'body': data}, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+        identity = {'author_id': g.user.user_id, 'request_key': key}
+        existing = community_db().content.find_one(identity)
+        if existing:
+            if existing.get('request_hash') != request_hash:
+                abort(409, 'That request key was already used for different content.')
+            return jsonify(content=serialize([existing])[0], replayed=True), 200
         kind = "review" if request.path.endswith("reviews") else data.get("kind")
         if not isinstance(kind, str) or kind not in {"review", "thread", "comment"}:
             abort(400, "Choose review, thread or comment.")
@@ -93,6 +115,7 @@ def register_community(app, limiter):
                 "body": field(data, "text", 5000), "created_at": now(), "updated_at": now(),
                 "removed_at": None, "removed_by_id": None, "is_demo": False,
                 "dishes": dish_feedback(data, place_id)}
+        item.update(revision=1, request_key=key, request_hash=request_hash)
         if kind in {"review", "thread"}:
             item["title"] = field(data, "title", 150)
         if kind == "review":
@@ -103,13 +126,25 @@ def register_community(app, limiter):
             if parent["kind"] != "thread" or parent["place_id"] != place_id:
                 abort(400, "A reply must belong to a discussion at this same place.")
         item["_id"] = next_id("content")
-        community_db().content.insert_one(item)  # one atomic document, including dish feedback
-        return jsonify(content=serialize([item])[0]), 201
+        try:
+            community_db().content.insert_one(item)  # document and request receipt are atomic together
+        except DuplicateKeyError:
+            existing = community_db().content.find_one(identity)
+            if existing is None:
+                raise
+            if existing.get('request_hash') != request_hash:
+                abort(409, 'That request key was already used for different content.')
+            return jsonify(content=serialize([existing])[0], replayed=True), 200
+        return jsonify(content=serialize([item])[0], replayed=False), 201
 
     @app.route("/api/content/<int:content_id>", methods=["PATCH", "DELETE"])
     @authenticated()
     def change_content(content_id):
         item = visible(content_id)
+        revision = request.headers.get('If-Match', '').strip('"')
+        if not revision:
+            abort(428, 'Reload this post and supply its revision using If-Match.')
+        expected = integer(revision, 'revision')
         if request.method == "DELETE":
             if item["author_id"] != g.user.user_id and g.user.role != "admin":
                 abort(403, "Only the author or an administrator can remove this content.")
@@ -125,10 +160,14 @@ def register_community(app, limiter):
                 changes["rating"] = integer(data.get("rating"), "rating", 1, 5)
             if "dishes" in data:
                 changes["dishes"] = dish_feedback(data, item["place_id"])
-        result = community_db().content.update_one({"_id": content_id, "removed_at": None}, {"$set": changes})
+        revision_match = {'revision': expected} if 'revision' in item else {'revision': {'$exists': False}}
+        if expected != item.get('revision', 1):
+            abort(409, 'This post changed since you loaded it. Reload before editing.')
+        result = community_db().content.update_one({"_id": content_id, "removed_at": None, **revision_match},
+            {"$set": {**changes, 'revision': expected + 1}})
         if not result.matched_count:
             abort(409, "Content changed. Refresh and try again.")
-        return jsonify(ok=True)
+        return jsonify(ok=True, revision=expected + 1)
 
     @app.route("/api/content/<int:content_id>/upvote", methods=["PUT", "DELETE"])
     @authenticated()

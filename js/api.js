@@ -21,7 +21,7 @@ function imageUrl(value) {
 
 function listingLabel(place) {
   return (place.isSample ? '<span class="tag">Sample listing</span>' : '') +
-    (place.hasReferenceMenu ? '<span class="tag">Chain reference prices</span>' : '');
+    (place.hasReferenceMenu ? '<span class="tag">Chain reference menu</span>' : '');
 }
 
 function externalLink(url, label, className = '') {
@@ -88,7 +88,11 @@ async function api(path, options = {}) {
     body: options.body === undefined ? undefined : JSON.stringify(options.body)
   });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || `Request failed (${response.status}). Please try again.`);
+  if (!response.ok) {
+    const error = new Error(data.error || `Request failed (${response.status}). Please try again.`);
+    error.status = response.status;
+    throw error;
+  }
   return data;
 }
 

@@ -9,7 +9,9 @@ from .config import BASE_DIR
 def source_fingerprint():
     digest = hashlib.sha256()
     paths = [*BASE_DIR.joinpath('backend').glob('*.py'), *BASE_DIR.joinpath('tests').glob('*.py'),
-             BASE_DIR / 'scripts/run_database_evaluation.py']
+             *BASE_DIR.joinpath('scripts').glob('*.py'), *BASE_DIR.joinpath('js').glob('*.js'),
+             BASE_DIR / 'Dockerfile', BASE_DIR / 'compose.laptop.yaml', BASE_DIR / '.dockerignore',
+             BASE_DIR / 'backend/requirements.txt']
     for path in sorted(paths, key=lambda p: p.relative_to(BASE_DIR).as_posix()):
         digest.update(path.relative_to(BASE_DIR).as_posix().encode() + b'\0')
         digest.update(path.read_bytes().replace(b'\r\n', b'\n'))

@@ -1,0 +1,50 @@
+{
+  "checkedAt": "2026-10-27T11:10:15.389010+00:00",
+  "scope": "Local browser acceptance checks against isolated native MariaDB/MongoDB handover databases. No production content was changed.",
+  "files": {
+    "css/inline-actions.css": "16a340e4d9c5c87374dc5f6555acf545ae43b3d3fae7307044f2b52df0696860",
+    "js/inline-actions.js": "d033e9b3b4750611f46fb2516846c6de4575f6efcd9ff0d9786995bb96b51a53",
+    "js/api.js": "3ba7b47673c9e67514bde23ca9f6914f192a6c717a11e3b1557450210595c308",
+    "js/restaurant.js": "d4241fc1c7779e0a76990467551ab21b5061e1e4efd2106dbe699b960c98ef43",
+    "js/admin.js": "75c4dfa10379983e89e395dda02731be7765fe43303dc600b6c11af16d55a9fd",
+    "restaurant.html": "078846449f747892f64854464706e7b45359420d66a33a6bc1872d9a0d1ce17d",
+    "admin.html": "5d7403b3752681098bd9f2632e9f3a460216868ab408e38087da185af9e121f4"
+  },
+  "checks": [
+    "Review title, rating and message edit saved in its card and survived navigation/reload.",
+    "Empty review message kept the editor open, focused the field, and showed an inline error.",
+    "Report Other required details; successful submission showed Reported and local confirmation.",
+    "Remove opened inline Keep it/Remove controls; Keep it retained the review and restored focus.",
+    "Concurrent API edit caused HTTP 409; the browser retained the draft and explained recovery inline.",
+    "A new reply cleared its submitted composer while retaining an unfinished review draft.",
+    "Reply edit saved with Control+Enter; Escape cancelled editing and restored the trigger focus.",
+    "Removing a discussion replaced it and its replies with an inline status and updated the count.",
+    "Moderator removal succeeded with the current revision, then an inline note resolved the report.",
+    "Another synthetic report was dismissed through an inline moderation-note form.",
+    "Menu removal and venue archive displayed named inline confirmations; Keep it cancelled both.",
+    "390x844 phone viewport had no horizontal document overflow; form buttons measured 70px high.",
+    "Desktop and phone previews inspected; all four changed JavaScript files passed node --check.",
+    "No alert(), prompt(), or confirm() calls remain under js/."
+  ],
+  "screenshots": [
+    "inline-review-desktop-2026-10-27.png",
+    "inline-review-mobile-2026-10-27.png"
+  ],
+  "designDetector": {
+    "runs": 1,
+    "findings": "Warnings concern existing Inter typography, base-theme contrast, an intentionally hidden photo preview, and existing admin schema layout. Scoped forms use dark action colors and stronger field boundaries."
+  },
+  "deployment": {
+    "status": "blocked",
+    "reason": "Saved SSH login works as pyie. App VM SSH config is root-readable; sudo requires interactive authentication. No public files or databases were changed.",
+    "preparedPackage": "work/inline-actions-static-2026-10-27.zip"
+  },
+  "fixtureCleanup": {
+    "users": 3,
+    "content": 4,
+    "reports": 2,
+    "votes": 0,
+    "discoveryEvents": 2,
+    "scope": "Only inline_ui_* synthetic accounts and their related fixture records in the isolated handover database. Counter sequences retained."
+  }
+}

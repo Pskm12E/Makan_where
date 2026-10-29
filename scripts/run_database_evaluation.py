@@ -51,7 +51,7 @@ def main():
     clock = time.perf_counter()
     code = pytest.main(['tests' if args.full_suite else 'tests/test_database_evaluation.py', '-q', '--tb=short', '-rs'], plugins=[collector])
     outcomes = Counter(row['outcome'] for row in collector.results.values())
-    experiments = [row for row in collector.results.values() if row['test'].startswith('tests/test_database_evaluation.py::')]
+    experiments = [row for row in collector.results.values() if row['test'].startswith(('tests/test_database_evaluation.py::', 'tests/test_database_design.py::'))]
     result = {'formatVersion': 1, 'startedAt': started, 'finishedAt': datetime.now(timezone.utc).isoformat(),
         'sourceSha256': fingerprint, 'sourceUnchangedDuringRun': fingerprint == source_fingerprint(),
         'fullSuite': args.full_suite, 'exitCode': int(code),
@@ -63,10 +63,10 @@ def main():
         'scope': 'Independent Flask test clients and real database drivers in disposable databases. Not an HTTP/network load test.',
         'experiments': experiments,
         'limits': ['No distributed ACID transaction across SQL and MongoDB.',
-            'Injected failures test application recovery; they are not power-loss, replica failover or backup-restore tests.',
+            'Injected failures are not power-loss or replica failover tests. scripts/recovery_probe.py records separate restart/restore evidence.',
             'Benchmarks use a deterministic synthetic workload, warm caches and one host; timings are not a production capacity guarantee.',
-            'Content edits use last-write-wins; simultaneous edit conflict detection is not implemented.',
-            'A content POST interrupted after its MongoDB commit can have an ambiguous response; blindly retrying it may duplicate the post.']}
+            'Content edits require If-Match revisions; stale edits are rejected.',
+            'Content POST retries must reuse the same Idempotency-Key and identical payload. A new key represents a new request.']}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     temp = args.output.with_suffix('.tmp')
     temp.write_text(json.dumps(result, indent=2, default=str), encoding='utf-8')

@@ -224,15 +224,19 @@ def test_failure_after_content_commit_is_detectably_ambiguous(app, monkeypatch, 
     import backend.community as community
     payload={'kind':'thread','placeId':1,'title':'Ambiguous acknowledgement','text':'Test request'}
     def disconnected(_): raise AutoReconnect('Injected response read failure')
+    request_headers = {'Idempotency-Key': 'acknowledgement-test-request-2026'}
     with monkeypatch.context() as fault:
         fault.setattr(community,'serialize',disconnected)
-        response=owner.send('POST','/api/content',payload)
+        response=owner.send('POST','/api/content',payload, headers=request_headers)
     assert response.status_code == 503
     visible=owner.client.get('/api/content?place_id=1').json['content']
     assert len(visible) == 1
+    replay = owner.send('POST', '/api/content', payload, headers=request_headers)
+    assert replay.status_code == 200 and replay.json['replayed']
+    with app.app_context(): assert community_db().content.count_documents({}) == 1
     with app.app_context(): assert_clean()
     evidence(record_property, 'Concurrency and recovery', 'A 503 after a Mongo commit must not be described as rollback; read-back reveals the committed post.',
-        {'httpStatus':503,'documentsCommitted':1,'readAfterRecovery':200,'automaticPostRetrySafe':False})
+        {'httpStatus':503,'documentsCommitted':1,'readAfterRecovery':200,'sameKeyReplayStatus':200,'sameKeyRetrySafe':True})
 
 
 def test_sql_failure_blocks_mongo_write_then_recovers(app, monkeypatch, record_property):
@@ -361,3 +365,48 @@ def test_controlled_mongo_index_benchmark(app, record_property):
         assert result['indexedPlan']['documentsExamined'] < result['scanPlan']['documentsExamined']
         assert result['indexedPlan']['returned'] == result['scanPlan']['returned'] == 20
     evidence(record_property, 'Controlled benchmarks', 'Same Mongo feed query/results; executionStats measures document work for index versus collection scan.',result)
+
+
+def test_controlled_range_query_and_index_write_cost(app, record_property):
+    """Measure both the read benefit and maintenance cost on equal workloads."""
+    from sqlalchemy import Column, Integer, Numeric, MetaData, Table, Index
+    from decimal import Decimal
+    metadata = MetaData()
+    plain = Table('benchmark_plain', metadata, Column('id', Integer, primary_key=True), Column('price', Numeric(10, 2), nullable=False))
+    indexed = Table('benchmark_indexed', metadata, Column('id', Integer, primary_key=True), Column('price', Numeric(10, 2), nullable=False))
+    Index('benchmark_price', indexed.c.price, indexed.c.id)
+    batch = [{'id': i + 1, 'price': Decimal(i % 1000) / 100} for i in range(4000)]
+    with app.app_context():
+        metadata.create_all(db.engine)
+        with db.engine.connect() as connection:
+            def write(table):
+                connection.execute(table.delete())
+                connection.execute(table.insert(), batch)
+                connection.commit()
+                return [[len(batch), str(sum(r['price'] for r in batch))]]
+            writes = paired_benchmark(lambda: write(indexed), lambda: write(plain))
+            write(indexed)
+            is_sqlite = db.engine.dialect.name == 'sqlite'
+            index_hint = 'INDEXED BY benchmark_price' if is_sqlite else 'FORCE INDEX (benchmark_price)'
+            scan_hint = 'NOT INDEXED' if is_sqlite else 'IGNORE INDEX (PRIMARY, benchmark_price)'
+            suffix = ' WHERE price BETWEEN 9.50 AND 9.75 ORDER BY price,id LIMIT 20'
+            first = 'SELECT id,price FROM benchmark_indexed ' + index_hint + suffix
+            second = 'SELECT id,price FROM benchmark_indexed ' + scan_hint + suffix
+            run = lambda query: [[r.id, str(r.price)] for r in connection.execute(text(query))]
+            reads = paired_benchmark(lambda: run(first), lambda: run(second))
+            explain = 'EXPLAIN QUERY PLAN ' if is_sqlite else 'EXPLAIN FORMAT=JSON '
+            plans = {name: [list(r) for r in connection.execute(text(explain + query))]
+                     for name, query in [('indexed', first), ('scan', second)]}
+            storage = {'engine': db.engine.dialect.name}
+            if not is_sqlite:
+                connection.execute(text('ANALYZE TABLE benchmark_plain,benchmark_indexed')).all()
+                storage['tableBytes'] = [dict(r) for r in connection.execute(text("SELECT TABLE_NAME, DATA_LENGTH, INDEX_LENGTH FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME IN ('benchmark_plain','benchmark_indexed') ORDER BY TABLE_NAME")).mappings()]
+            else:
+                storage['pageSize'] = connection.scalar(text('PRAGMA page_size'))
+                storage['limitation'] = 'SQLite page count is database-wide; per-index bytes are not inferred.'
+        metadata.drop_all(db.engine)
+    evidence(record_property, 'Controlled benchmarks',
+        'Equal range-query results and equal batch-write payloads; index storage and maintenance are measured without assuming a speed winner.',
+        {'datasetRows': len(batch), 'rangeRead': reads, 'rangePlans': plans, 'batchWrite': writes, 'storage': storage,
+         'writeWorkload': 'Delete previous 4000 rows, insert identical deterministic rows, commit. No index creation in timing.',
+         'limits': 'Warm single-host samples; storage statistics are engine-reported allocation, not compressed payload sizes.'})

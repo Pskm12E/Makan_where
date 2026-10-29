@@ -22,6 +22,9 @@ CONTENT_SCHEMA = {
         "removed_by_id": {"bsonType": ["int", "long", "null"]},
         "is_demo": {"bsonType": "bool"},
         "is_example": {"bsonType": "bool"},
+        "revision": {"bsonType": "int", "minimum": 1},
+        "request_key": {"bsonType": "string", "minLength": 16, "maxLength": 128},
+        "request_hash": {"bsonType": "string", "minLength": 64, "maxLength": 64},
         "dishes": {"bsonType": "array", "maxItems": 20, "items": {
             "bsonType": "object", "required": ["dish_id", "feedback"],
             "properties": {"dish_id": ID, "feedback": {"bsonType": ["string", "null"], "maxLength": 1000}}}},
@@ -42,7 +45,15 @@ VALIDATORS = {
     "reports": {"$jsonSchema": {"bsonType": "object", "required": ["_id", "reporter_id", "content_id", "reason", "status", "created_at"],
         "properties": {"_id": ID, "reporter_id": ID, "content_id": ID,
                        "reason": {"bsonType": "string", "minLength": 1, "maxLength": 1000},
-                       "status": {"enum": ["open", "resolved", "dismissed"]}, "created_at": DATE}}},
+                       "status": {"enum": ["open", "resolved", "dismissed"]}, "created_at": DATE,
+                       "resolved_by_id": ID, "resolved_at": DATE,
+                       "resolution_note": {"bsonType": "string", "minLength": 1, "maxLength": 1000}},
+        "oneOf": [
+            {"properties": {"status": {"enum": ["open"]}},
+             "not": {"anyOf": [{"required": ["resolved_by_id"]}, {"required": ["resolved_at"]}, {"required": ["resolution_note"]}]}},
+            {"properties": {"status": {"enum": ["resolved", "dismissed"]}},
+             "required": ["resolved_by_id", "resolved_at", "resolution_note"]},
+        ]}},
 }
 
 
@@ -62,6 +73,14 @@ def community_db():
 def init_collections():
     mongo = community_db()
     existing = mongo.list_collection_names()
+    if 'reports' in existing:
+        mongo.reports.update_many({'status': 'open', 'resolved_by_id': None, 'resolved_at': None, 'resolution_note': None},
+            {'$unset': {'resolved_by_id': '', 'resolved_at': '', 'resolution_note': ''}})
+    # Refuse to silently approve malformed history when tightening validators.
+    if 'reports' in existing and mongo.reports.count_documents({'$nor': [VALIDATORS['reports']]}):
+        raise ValueError('Existing moderation records violate the resolution contract. Audit and repair them before init-mongo.')
+    if 'content' in existing:
+        mongo.content.update_many({'revision': {'$exists': False}}, {'$set': {'revision': 1}})
     for name, validator in VALIDATORS.items():
         if name in existing:
             mongo.command("collMod", name, validator=validator, validationLevel="strict", validationAction="error")
@@ -70,6 +89,8 @@ def init_collections():
     mongo.content.create_index([("place_id", 1), ("removed_at", 1), ("kind", 1), ("_id", 1)], name="place_feed")
     mongo.content.create_index([("thread_id", 1), ("removed_at", 1)], name="thread_replies")
     mongo.content.create_index("seed_key", unique=True, partialFilterExpression={"seed_key": {"$type": "string"}})
+    mongo.content.create_index([('author_id', 1), ('request_key', 1)], unique=True,
+        name='one_content_per_request', partialFilterExpression={'request_key': {'$type': 'string'}})
     mongo.upvotes.create_index([("user_id", 1), ("content_id", 1)], unique=True, name="one_vote_per_user")
     mongo.upvotes.create_index("content_id")
     mongo.reports.create_index([("status", 1), ("created_at", 1)])

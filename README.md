@@ -1,5 +1,11 @@
 # Makan Where
 
+**27 October database revision:** shared menu facts now use `menu_publication` and `menu_entry`; the existing `dish` identity represents an outlet offering with explicit overrides. Tags use `tag`/`place_tag`. Content creation requires an `Idempotency-Key`, and edits/removal require an `If-Match` revision. See the current [architecture and recovery policy](docs/system_architecture.md#implemented-database-refinement--27-october-2026) and [Docker handover](docs/docker_laptop_guide.md). Earlier deployment/results below remain dated historical observations.
+
+**Dish selection correction:** retained chain menu names are now imported as real, reviewable outlet dishes. An unknown published price stays `NULL` and displays as **Price not listed**. Fresh laptop/Docker setup imports these automatically. For an existing installation, back up and stop writes, run `flask --app backend.app migrate-design`, preview `flask --app backend.app import-menu-highlights`, then apply with `--apply`. Existing dish IDs, prices, edits and removals are retained. This requires backend/schema/data deployment; copying frontend files alone does not populate the dropdown.
+
+Existing installations must stop application writes and retain a matching SQL/Mongo backup pair before upgrading. Run `python scripts/run_demo.py --migrate-design --env YOUR_PRIVATE_ENV`, then `init-db`/`init-mongo` with that same private environment before starting the new app. Docker's setup job performs the upgrade before starting the website. No production database is changed by checking out this revision.
+
 Python / Flask food discovery and community reviews for INF2003. **SQL and MongoDB are now used together:** SQL owns accounts, venues, menus, favourites and events; MongoDB owns reviews, discussions, replies, votes and moderation.
 
 **Database access is implemented in this repository.** Flask uses SQLAlchemy/PyMySQL directly for MariaDB and PyMongo directly for MongoDB. The application does not call a DBStudios API or require its dashboard. The in-app **Database evidence** page runs the fixed Python queries in `backend/database_lab.py`; see the [database code map](docs/database_code_map.md) for CRUD, aggregation, schema and connection entry points.

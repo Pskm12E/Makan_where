@@ -14,18 +14,20 @@ from .models import db, Area, FoodPlace, Dish, User, Favourite, PopulationRun, n
 from .mongo import community_db, VALIDATORS, rating_pipeline
 from .services import authenticated
 
-LIVE_SQL = {'area', 'category', 'cuisine', 'place_cuisine', 'food_place', 'dish', 'user', 'favourite', 'discovery_event', 'population_run'}
+LIVE_SQL = {'area', 'category', 'cuisine', 'place_cuisine', 'food_place', 'dish', 'user', 'favourite', 'discovery_event', 'population_run', 'tag', 'place_tag', 'menu_publication', 'menu_entry'}
 VIEW_SQL = '''SELECT p.place_id, p.place_name, COUNT(d.dish_id) AS available_dishes,
 MIN(d.price) AS starting_price, AVG(d.price) AS average_price
-FROM food_place p LEFT JOIN dish d ON d.place_id = p.place_id AND d.is_available = 1
+FROM food_place p LEFT JOIN catalogue_effective_menu d ON d.place_id = p.place_id AND d.is_available = 1
 WHERE p.archived_at IS NULL GROUP BY p.place_id, p.place_name'''
 
 
 def install_views():
-    inspector = inspect(db.engine)
-    if 'catalogue_menu_summary' not in inspector.get_view_names():
-        with db.engine.begin() as connection:
-            connection.execute(text('CREATE VIEW catalogue_menu_summary AS ' + VIEW_SQL))
+    from .catalogue_design import EFFECTIVE_MENU_SQL
+    with db.engine.begin() as connection:
+        connection.execute(text('DROP VIEW IF EXISTS catalogue_menu_summary'))
+        connection.execute(text('DROP VIEW IF EXISTS catalogue_effective_menu'))
+        connection.execute(text('CREATE VIEW catalogue_effective_menu AS ' + EFFECTIVE_MENU_SQL))
+        connection.execute(text('CREATE VIEW catalogue_menu_summary AS ' + VIEW_SQL))
 
 
 def integrity_audit():
@@ -216,12 +218,16 @@ def lab_snapshot():
                 ['food_place', 'place_id → place_name, address, area_id, category_id, …', 'One venue identity determines its attributes. Names alone are not keys.'],
                 ['area', 'area_id → area_name; area_name → area_id (UNIQUE NOT NULL)', 'Area name is stored once; rename one row instead of every venue.'],
                 ['dish', 'dish_id → place_id, dish_name, price, …', 'Dish names can repeat at different venues; use a surrogate primary key.'],
+                ['menu_publication', 'publication_id → source observation; payload_sha256 → publication_id', 'One immutable source observation; URLs alone are not unique observations.'],
+                ['menu_entry', '(publication_id, source_item_id) → item_name, reference_price, description, dietary_label', 'A source item ID is scoped to its publication. Shared facts are stored once.'],
+                ['dish (outlet offering)', '(place_id, publication_id, source_item_id) → dish_id; dish_id → outlet overrides', 'Stable existing dish IDs retain Mongo feedback and legacy SQL links. Reference offerings clear legacy payload columns.'],
+                ['place_tag', '(place_id, tag_id) is the key', 'Multivalued tags use relationship rows; the retained JSON column is empty after migration.'],
                 ['user', 'user_id → profile; email → user_id; username → user_id', 'Email and username are alternate candidate keys, enforced UNIQUE NOT NULL.'],
                 ['favourite', '(user_id, place_id) → saved_at', 'Composite key permits many venues per user but only one save per pair.'],
                 ['place_cuisine', '(place_id, cuisine_id) is the key', 'Junction table resolves a many-to-many relationship without comma-separated cuisine IDs.'],
             ],
             'reasoning': 'A denormalized Venue(place_id, area_id, area_name) has the transitive dependency place_id → area_id → area_name. Decompose into food_place and area. Joining on area_id is lossless because area_id is a key of area; the dependencies are preserved. This explains this decomposition, not a proof that every field in the whole system is 3NF.',
-            'tradeoff': 'tags is a non-relational JSON presentation field; structured cuisine filtering uses the normalized junction table. Mongo embeds at most 20 dish references/feedback per content document for atomic updates; unbounded replies and votes are separate documents. Dataset checks cannot establish all semantic functional dependencies.'}}
+            'tradeoff': 'Shared menu facts and tag memberships are normalized. Legacy dish columns support manual dishes and offline upgrade compatibility; effective menus use the joined catalogue_effective_menu view. Enrichment/receipt JSON are explicit non-flat operational exceptions. Mongo embeds bounded feedback; unbounded replies/votes are separate. This is not a whole-schema BCNF claim.'}}
 
 
 def register_lab(app, limiter):

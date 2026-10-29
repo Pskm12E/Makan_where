@@ -2,6 +2,8 @@
 
 This setup runs the website, MariaDB and MongoDB locally using Docker Compose. Python database operations remain in the project code: SQLAlchemy/PyMySQL for MariaDB and PyMongo for MongoDB. No DBStudios, separate database installation, server VPN, production credentials or external data API is required.
 
+Setup also imports the retained published menu names as selectable database dishes. McDonald's menu names do not include source prices, so their shared `menu_entry.reference_price` is `NULL` and the site shows **Price not listed**. Repeat setup keeps existing dish IDs, known prices, edits and removals. Existing installations run the price-nullability upgrade through `migrate-design` before the source-name import. The normal laptop setup performs these steps automatically. This change does not resolve the local Docker Desktop engine startup issue recorded in the verification log; container execution still needs verification on a working Docker host.
+
 ## What you need
 
 - The complete project folder, including `data/`, `database/` and the retained source CSV/JSON files. Copy source files, not `.env.demo`, `.env.laptop`, `.venv`, `work`, or anyone else's database volumes.
@@ -124,7 +126,21 @@ docker compose --env-file .env.laptop -f compose.laptop.yaml logs --tail 100 set
 docker compose --env-file .env.laptop -f compose.laptop.yaml logs --tail 100 mariadb mongodb
 ```
 
-The proposed normalised menu redesign in `database/design_v2.py` remains a separate validated proposal. This portable build runs the existing implemented application schema; it does not silently migrate to the proposal. Refer to the appended verification record for the environments and checks actually exercised.
+The 27 October application schema implements shared publications/items and relational tags. To preserve old dish references, the physical `dish` table is the outlet offering rather than creating unrelated offering IDs. The original `database/design_v2.py` remains a teaching prototype; the runtime mapping is in `backend/models.py` and `backend/catalogue_design.py`. Existing volumes are upgraded by setup, with the app stopped. Keep a matching SQL/Mongo backup pair before an existing installation upgrade. Refer to the dated verification record for the environments actually exercised.
+
+## 4. Separate graceful-restart and logical-restore evidence
+
+Run this after the evaluation containers are available and no other evaluation is running. Use a new proof directory for each run:
+
+```text
+docker compose --env-file .env.laptop -f compose.laptop.yaml --profile evaluation run --build --rm recovery prepare --directory /evidence/recovery-20261027
+docker compose --env-file .env.laptop -f compose.laptop.yaml --profile evaluation restart test-sql test-mongo
+docker compose --env-file .env.laptop -f compose.laptop.yaml --profile evaluation up -d --wait test-sql test-mongo
+docker compose --env-file .env.laptop -f compose.laptop.yaml --profile evaluation run --rm recovery verify --directory /evidence/recovery-20261027
+docker compose --env-file .env.laptop -f compose.laptop.yaml cp app:/evidence/recovery-20261027/result.json ./database-recovery.json
+```
+
+This touches only uniquely named proof databases inside the isolated test engines. It never restarts the application's MariaDB/MongoDB services. Preparation refuses to replace an existing proof directory. Verification retains the proof/restored databases for inspection, compares complete snapshots, checks cross-engine references, and records whether reduced engine uptimes corroborate the restart. Only claim restart evidence when `restartObserved` is true. This is a known-schema logical restore with quiescent synthetic data, not a full production/physical backup, power-loss or failover test.
 
 ## Verification status and code updates
 

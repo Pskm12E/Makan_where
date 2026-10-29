@@ -15,6 +15,7 @@ COPY scripts/ scripts/
 COPY tests/ tests/
 COPY deploy/ deploy/
 COPY *.html pytest.ini ./
+COPY Dockerfile compose.laptop.yaml .dockerignore ./
 USER app
 EXPOSE 5055
 CMD ["waitress-serve", "--host=0.0.0.0", "--port=5055", "--threads=6", "--call", "backend.app:create_app"]

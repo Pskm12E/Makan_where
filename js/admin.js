@@ -20,8 +20,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('adminMenuFilter').addEventListener('change', () => { adminPage = 0; renderAdminEstablishments(); });
   document.getElementById('adminPrevious').addEventListener('click', () => { adminPage--; renderAdminEstablishments(); });
   document.getElementById('adminNext').addEventListener('click', () => { adminPage++; renderAdminEstablishments(); });
-  document.getElementById('refreshSchemaBtn').addEventListener('click', loadSchema);
+  document.getElementById('refreshSchemaBtn').addEventListener('click', () => window.SchemaLive.refresh());
   document.getElementById('schemaSearch').addEventListener('input', renderSchema);
+  window.SchemaEditor.init();
+  window.SchemaLive.init();
+  if (location.hash === '#schema') await showAdminPanel('schema');
   const requestedMenu = Number(new URLSearchParams(location.search).get('menu'));
   if (requestedMenu && foodFinderData.some(p => p.id === requestedMenu)) {
     adminMenuPlaceId = requestedMenu; renderAdminMenu();
@@ -36,19 +39,21 @@ function adminMessage(message) {
 }
 
 async function showAdminPanel(name) {
+  if (!InlineActions.canLeave()) return;
   document.querySelectorAll('[data-admin-panel]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.adminPanel === name)));
   for (const panel of ['catalogue', 'imports', 'reports', 'schema']) document.getElementById('panel-' + panel).hidden = panel !== name;
   if (name === 'imports') await withAction(null, loadMenuImportStatus);
   if (name === 'reports') await withAction(null, loadReports);
-  if (name === 'schema' && !adminSchema) await loadSchema();
+  if (name === 'schema') await window.SchemaLive.refresh();
 }
 
 function renderAdminEstablishments() {
+  if (!InlineActions.canLeave()) return;
   document.getElementById('statsPhotos').textContent = foodFinderData.filter(p => p.image).length.toLocaleString();
   document.getElementById('statsLinks').textContent = foodFinderData.filter(p => p.menuUrl || p.menu.some(d => d.availability)).length.toLocaleString();
   document.getElementById('statsCount').textContent = foodFinderData.length.toLocaleString();
   document.getElementById('statsMenus').textContent = foodFinderData.filter(p => p.menu.some(d => d.availability)).length.toLocaleString();
-  const prices = foodFinderData.flatMap(p => p.menu.filter(d => d.availability).map(d => d.price));
+  const prices = foodFinderData.flatMap(p => p.menu.filter(d => d.availability && d.price !== null).map(d => d.price));
   document.getElementById('statsAvgPrice').textContent = prices.length ? priceLabel(prices.reduce((a, b) => a + b, 0) / prices.length) : 'No menu yet';
   const search = document.getElementById('adminSearch').value.trim().toLowerCase();
   const coverage = document.getElementById('adminMenuFilter').value;
@@ -60,18 +65,24 @@ function renderAdminEstablishments() {
   document.getElementById('adminPageInfo').textContent = matches.length ? `${start + 1}–${Math.min(start + ADMIN_PAGE_SIZE, matches.length)} of ${matches.length.toLocaleString()} establishments` : 'No matching establishments';
   document.getElementById('adminPrevious').disabled = adminPage === 0;
   document.getElementById('adminNext').disabled = start + ADMIN_PAGE_SIZE >= matches.length;
-  list.innerHTML = matches.slice(start, start + ADMIN_PAGE_SIZE).map(item => `<div class="admin-row"><img class="admin-row-photo" src="${imageUrl(item.image)}" alt="${escapeHtml(item.photo.kind === 'venue' ? 'Venue photo' : 'Illustrative photo')}" loading="lazy"><div><strong>${escapeHtml(item.name)}</strong><br><small>${escapeHtml(item.area)} · ${escapeHtml(item.address)}</small><p>${item.menu.filter(d => d.availability).length} priced menu items ${item.menuUrl ? externalLink(item.menuUrl, 'Source menu ↗') : ''} ${listingLabel(item)}</p></div><div class="admin-row-actions"><button class="small-action" data-menu="${item.id}">Manage menu</button><button class="secondary-btn" data-import-menu="${item.id}">Import menu</button><button class="small-action" data-edit="${item.id}">Edit</button><button class="danger-btn" data-archive="${item.id}">Archive</button></div></div>`).join('') || '<p class="empty-state">Try another name, area or cuisine.</p>';
+  list.innerHTML = matches.slice(start, start + ADMIN_PAGE_SIZE).map(item => `<div class="admin-row"><img class="admin-row-photo" src="${imageUrl(item.image)}" alt="${escapeHtml(item.photo.kind === 'venue' ? 'Venue photo' : 'Illustrative photo')}" loading="lazy"><div><strong>${escapeHtml(item.name)}</strong><br><small>${escapeHtml(item.area)} · ${escapeHtml(item.address)}</small><p>${item.menu.filter(d => d.availability && d.price !== null).length} priced menu items ${item.menuUrl ? externalLink(item.menuUrl, 'Source menu ↗') : ''} ${listingLabel(item)}</p></div><div class="admin-row-actions"><button class="small-action" data-menu="${item.id}">Manage menu</button><button class="secondary-btn" data-import-menu="${item.id}">Import menu</button><button class="small-action" data-edit="${item.id}">Edit</button><button class="danger-btn" data-archive="${item.id}">Archive</button></div></div>`).join('') || '<p class="empty-state">Try another name, area or cuisine.</p>';
   list.querySelectorAll('[data-import-menu]').forEach(button => button.addEventListener('click', () => withAction(button, async () => {
     setMenuImportJson(await api(`/admin/establishments/${button.dataset.importMenu}/menu-template`));
     await showAdminPanel('imports');
   })));
-  list.querySelectorAll('[data-archive]').forEach(button => button.addEventListener('click', event => withAction(event.currentTarget, async () => {
-    if (!confirm('Archive this establishment? Existing reviews and favourites will be retained.')) return;
-    await api(`/admin/establishments/${button.dataset.archive}`, {method: 'DELETE'});
-    if (adminMenuPlaceId === Number(button.dataset.archive)) closeAdminMenu();
-    if (document.getElementById('editId').value === button.dataset.archive) resetAdminForm();
-    await refreshPlaces(); renderAdminEstablishments(); adminMessage('Establishment archived.');
-  })));
+  list.querySelectorAll('[data-archive]').forEach(button => button.addEventListener('click', () => {
+    const item = foodFinderData.find(place => place.id === Number(button.dataset.archive));
+    InlineActions.open({host:button.closest('.admin-row'), trigger:button, title:`Archive ${item.name}?`, destructive:true,
+      content:'<p>This venue will be hidden from the catalogue. Existing reviews and favourites will be retained.</p>',
+      submitLabel:'Archive venue', busyLabel:'Archiving…',
+      submit:() => api(`/admin/establishments/${item.id}`, {method:'DELETE'}),
+      success:async () => {
+        if (adminMenuPlaceId === item.id) closeAdminMenu();
+        if (document.getElementById('editId').value === String(item.id)) resetAdminForm();
+        await refreshPlaces(); renderAdminEstablishments(); adminMessage('Establishment archived.');
+        document.getElementById('adminSearch').focus({preventScroll:true});
+      }});
+  }));
   list.querySelectorAll('[data-menu]').forEach(button => button.addEventListener('click', () => {
     adminMenuPlaceId = Number(button.dataset.menu);
     resetDishForm(); renderAdminMenu();
@@ -122,6 +133,7 @@ function resetAdminForm() {
 }
 
 function closeAdminMenu() {
+  if (!InlineActions.canLeave()) return;
   adminMenuPlaceId = null;
   document.getElementById('adminMenuPanel').hidden = true;
   resetDishForm();
@@ -129,6 +141,8 @@ function closeAdminMenu() {
 
 function resetDishForm() {
   document.getElementById('adminDishForm').reset();
+  document.getElementById('dishPrice').required = true;
+  document.getElementById('dishPrice').placeholder = '';
   document.getElementById('editDishId').value = '';
   document.getElementById('dishFormTitle').textContent = 'Add dish';
   document.getElementById('saveDishBtn').textContent = 'Add dish';
@@ -151,6 +165,7 @@ function attachMenuForm() {
 }
 
 function renderAdminMenu() {
+  if (!InlineActions.canLeave()) return;
   const place = foodFinderData.find(p => p.id === adminMenuPlaceId);
   if (!place) { closeAdminMenu(); return; }
   document.getElementById('adminMenuPanel').hidden = false;
@@ -162,7 +177,9 @@ function renderAdminMenu() {
     const dish = place.menu.find(d => d.id === Number(button.dataset.editDish));
     document.getElementById('editDishId').value = dish.id;
     document.getElementById('dishName').value = dish.name;
-    document.getElementById('dishPrice').value = dish.price.toFixed(2);
+    document.getElementById('dishPrice').value = dish.price === null ? '' : dish.price.toFixed(2);
+    document.getElementById('dishPrice').required = dish.price !== null;
+    document.getElementById('dishPrice').placeholder = dish.price === null ? 'Price not listed' : '';
     document.getElementById('dishDietary').value = dish.dietary;
     document.getElementById('dishDescription').value = dish.description || '';
     document.getElementById('dishFormTitle').textContent = 'Edit dish';
@@ -170,13 +187,26 @@ function renderAdminMenu() {
     document.getElementById('cancelDishBtn').hidden = false;
     document.getElementById('dishName').focus();
   }));
-  list.querySelectorAll('[data-toggle-dish]').forEach(button => button.addEventListener('click', event => withAction(event.currentTarget, async () => {
+  list.querySelectorAll('[data-toggle-dish]').forEach(button => button.addEventListener('click', () => {
     const dish = place.menu.find(d => d.id === Number(button.dataset.toggleDish));
-    if (dish.availability && !confirm('Remove this dish from the public menu? Past review links will be retained.')) return;
-    await api(`/admin/establishments/${place.id}/dishes/${dish.id}`, dish.availability ? {method: 'DELETE'} : {method: 'PATCH', body: {...dish, availability: true}});
-    resetDishForm(); await refreshPlaces(); renderAdminEstablishments(); renderAdminMenu();
-    adminMessage(dish.availability ? 'Dish removed from the public menu.' : 'Dish restored.');
-  })));
+    const success = async () => {
+      resetDishForm(); await refreshPlaces(); renderAdminEstablishments(); renderAdminMenu();
+      adminMessage(dish.availability ? 'Dish removed from the public menu.' : 'Dish restored.');
+      document.querySelector(`[data-toggle-dish="${dish.id}"]`)?.focus({preventScroll:true});
+    };
+    if (!dish.availability) {
+      if (!InlineActions.canLeave()) return;
+      InlineActions.run(button, button.closest('.admin-row'), async () => {
+        await api(`/admin/establishments/${place.id}/dishes/${dish.id}`, {method:'PATCH',body:{...dish,availability:true}});
+        await success();
+      }, 'Restoring…');
+      return;
+    }
+    InlineActions.open({host:button.closest('.admin-row'), trigger:button, title:`Remove ${dish.name} from the menu?`, destructive:true,
+      content:'<p>This dish will be hidden from the public menu. Past review links will be retained. You can restore it here later.</p>',
+      submitLabel:'Remove dish', busyLabel:'Removing…',
+      submit:() => api(`/admin/establishments/${place.id}/dishes/${dish.id}`, {method:'DELETE'}), success});
+  }));
 }
 
 async function loadSchema() {
@@ -186,14 +216,22 @@ async function loadSchema() {
   const tables = document.getElementById('schemaTables');
   try {
     if (!adminSchema) tables.textContent = 'Reading the database structure…';
+    const before = adminSchema;
     adminSchema = await api('/admin/schema');
     const columns = adminSchema.tables.reduce((sum, table) => sum + table.columns.length, 0);
     document.getElementById('schemaSummary').textContent = `${adminSchema.engine} · ${adminSchema.tables.length} tables · ${columns} columns · Live, read-only metadata`;
-    renderSchema();
+    if (JSON.stringify(before) !== JSON.stringify(adminSchema)) {
+      renderSchema();
+      window.SchemaDiagram?.render(adminSchema);
+    }
+    window.SchemaLive?.schemaReceived(before, adminSchema);
+    window.SchemaEditor?.update(adminSchema);
   } catch (error) {
     adminSchema = null;
     document.getElementById('schemaSummary').textContent = 'Schema unavailable';
     tables.textContent = error.message;
+    window.SchemaDiagram?.clear(error.message);
+    window.SchemaLive?.schemaFailed();
   } finally { button.disabled = false; }
 }
 
@@ -204,26 +242,46 @@ function renderSchema() {
   const columnNames = values => values.map(value => escapeHtml(value)).join(', ');
   document.getElementById('schemaTables').innerHTML =
     (adminSchema.missingTables.length ? `<p class="form-notice error">Missing application tables: ${columnNames(adminSchema.missingTables)}</p>` : '') +
-    matching.map(table => `<details class="schema-table"><summary><strong>${escapeHtml(table.name)}</strong><span>${table.columns.length} columns · ${table.foreignKeys.length} relationships</span></summary>
+    matching.map(table => `<details class="schema-table" data-schema-table="${escapeHtml(table.name)}"><summary><strong>${escapeHtml(table.name)}</strong><span>${table.columns.length} columns · ${table.foreignKeys.length} relationships</span></summary>
       <div class="schema-table-body"><div class="schema-scroll"><table><caption>${escapeHtml(table.name)} columns</caption><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Nullable</th><th scope="col">Default</th></tr></thead><tbody>${table.columns.map(column => `<tr><th scope="row">${escapeHtml(column.name)}</th><td>${escapeHtml(column.type)}</td><td>${column.primaryKey ? 'PK ' : ''}${table.foreignKeys.some(f => f.columns.includes(column.name)) ? 'FK' : ''}</td><td>${column.nullable ? 'Yes' : 'No'}</td><td>${escapeHtml(column.default ?? '—')}</td></tr>`).join('')}</tbody></table></div>
       <h3>Relationships</h3>${table.foreignKeys.length ? '<ul>' + table.foreignKeys.map(f => `<li><code>${columnNames(f.columns)}</code> → <code>${escapeHtml(f.table)} (${columnNames(f.targetColumns)})</code></li>`).join('') + '</ul>' : '<p>No outgoing foreign keys.</p>'}
       <h3>Indexes and constraints</h3><ul><li>Primary key: ${columnNames(table.primaryKey) || 'None'}</li>${table.uniqueConstraints.map(u => `<li>Unique: ${columnNames(u.columns)}</li>`).join('')}${table.indexes.map(i => `<li>${i.unique ? 'Unique index' : 'Index'} ${escapeHtml(i.name)}: ${columnNames(i.columns)}</li>`).join('')}${table.checks.map(c => `<li>Check: <code>${escapeHtml(c.expression)}</code></li>`).join('')}</ul></div></details>`).join('') || '<p>No matching tables or columns.</p>';
 }
 
 async function loadReports() {
+  if (!InlineActions.canLeave()) return;
   const {reports} = await api('/admin/reports');
+  // The feed also works with deployments predating the single-post endpoint.
+  const posts = reports.length ? await apiAll('/content', 'content') : [];
   const section = document.getElementById('moderationReports');
-  section.innerHTML = `<h2>Content reports</h2>${reports.length ? reports.map(r => `<article class="review-item"><strong>${escapeHtml(r.reason)}</strong><p>${escapeHtml(r.text)}</p><div class="content-actions"><button class="danger-btn" data-remove="${r.contentId}">Remove content</button><button class="secondary-btn" data-resolve="${r.id}" data-status="resolved">Resolve</button><button class="secondary-btn" data-resolve="${r.id}" data-status="dismissed">Dismiss</button></div></article>`).join('') : '<p>No open reports.</p>'}`;
-  section.querySelectorAll('[data-remove]').forEach(button => button.addEventListener('click', event => withAction(event.currentTarget, async () => {
-    if (!confirm('Remove the reported content from public view?')) return;
-    await api(`/content/${button.dataset.remove}`, {method: 'DELETE'}); button.textContent = 'Removed';
-    adminMessage('Reported content removed.');
-  })));
-  section.querySelectorAll('[data-resolve]').forEach(button => button.addEventListener('click', event => withAction(event.currentTarget, async () => {
-    const note = prompt('Resolution note:'); if (!note?.trim()) return;
-    await api(`/admin/reports/${button.dataset.resolve}`, {method: 'PATCH', body: {status: button.dataset.status, note}}); await loadReports();
-    adminMessage('Report updated.');
-  })));
+  section.innerHTML = `<h2>Content reports</h2>${reports.length ? reports.map(r => `<article class="review-item"><strong>${escapeHtml(r.reason)}</strong><p class="user-content">${escapeHtml(r.text)}</p><div class="content-actions"><button type="button" class="danger-btn" data-remove="${r.contentId}" ${posts.some(post => post.id === r.contentId) ? '' : 'disabled'}>${posts.some(post => post.id === r.contentId) ? 'Remove content' : 'Content already hidden'}</button><button type="button" class="secondary-btn" data-resolve="${r.id}" data-status="resolved">Resolve</button><button type="button" class="secondary-btn" data-resolve="${r.id}" data-status="dismissed">Dismiss</button></div></article>`).join('') : '<p>No open reports.</p>'}`;
+  section.querySelectorAll('[data-remove]').forEach(button => button.addEventListener('click', () => {
+    const item = posts.find(post => post.id === Number(button.dataset.remove));
+    if (!item) return;
+    const host = button.closest('article');
+    InlineActions.open({host, trigger:button, title:'Remove this reported content?', destructive:true,
+      content:`<p>The ${item.kind === 'thread' ? 'discussion and its replies' : 'post'} will be hidden from public view. You can then resolve this report below.</p>`,
+      submitLabel:'Remove content', busyLabel:'Removing…',
+      submit:() => api(`/content/${item.id}`, {method:'DELETE',headers:Number.isInteger(item.revision) ? {'If-Match':String(item.revision)} : {}}),
+      success:() => {
+        section.querySelectorAll(`[data-remove="${item.id}"]`).forEach(control => { control.disabled = true; control.textContent = 'Content removed'; });
+        InlineActions.notice(host, 'Content removed. Resolve the report to close it.');
+        host.querySelector('[data-resolve]')?.focus({preventScroll:true});
+      }});
+  }));
+  section.querySelectorAll('[data-resolve]').forEach(button => button.addEventListener('click', () => {
+    const host = button.closest('article');
+    const dismiss = button.dataset.status === 'dismissed';
+    InlineActions.open({host, trigger:button, title:dismiss ? 'Dismiss this report' : 'Resolve this report',
+      content:`<p>${dismiss ? 'Close this report without taking further action.' : 'Record the action taken before closing this report.'}</p><label for="__ACTION_ID__-note">Moderation note<textarea id="__ACTION_ID__-note" name="note" maxlength="1000" rows="3" required></textarea></label>`,
+      submitLabel:dismiss ? 'Dismiss report' : 'Resolve report', busyLabel:'Saving…',
+      submit:form => api(`/admin/reports/${button.dataset.resolve}`, {method:'PATCH',body:{status:button.dataset.status,note:InlineActions.requireValue(form.elements.namedItem('note'), 'Enter a moderation note of up to 1,000 characters.', 1000)}}),
+      success:() => {
+        const status = document.createElement('p'); status.className = 'post-removed'; status.tabIndex = -1; status.setAttribute('role','status');
+        status.textContent = dismiss ? 'Report dismissed.' : 'Report resolved.';
+        host.replaceWith(status); status.focus({preventScroll:true});
+      }});
+  }));
 }
 
 function invalidateMenuPreview() {
@@ -267,7 +325,7 @@ function attachMenuImports() {
       const result = await api('/admin/menu-imports', {method:'POST',body:{menu}});
       menuImportPreview = result;
       document.getElementById('applyMenuImport').disabled = !result.added || result.conflicts.length > 0;
-      document.getElementById('menuImportPreview').innerHTML = `<div class="admin-card"><h3>Import preview</h3><p><strong>${result.added}</strong> new dishes · ${result.skipped} existing dishes preserved · ${result.conflicts.length} name conflicts</p><p>${escapeHtml(result.menu.sourceName)} · ${result.menu.isReference ? 'Chain reference; outlet availability and prices may differ.' : 'Outlet menu.'}</p><div class="schema-scroll"><table><thead><tr><th>Establishment</th><th>Address</th><th>New dishes</th></tr></thead><tbody>${result.places.map(p => `<tr><td>${escapeHtml(p.name)} (#${p.id})</td><td>${escapeHtml(p.address || 'Address not listed')}</td><td>${p.newItems}</td></tr>`).join('')}</tbody></table></div><details><summary>Review all ${result.menu.items.length} items and prices</summary><ul>${result.menu.items.map(d => `<li>${escapeHtml(d.name)} — SGD ${escapeHtml(d.price)}</li>`).join('')}</ul></details>${result.conflicts.length ? '<p>Resolve matching dish names in Manage menu before importing.</p>' : ''}</div>`;
+      document.getElementById('menuImportPreview').innerHTML = `<div class="admin-card"><h3>Import preview</h3><p><strong>${result.added}</strong> new dishes · ${result.skipped} existing dishes preserved · ${result.conflicts.length} name conflicts</p><p>${escapeHtml(result.menu.sourceName)} · ${result.menu.isReference ? 'Chain reference; outlet availability and prices may differ.' : 'Outlet menu.'}</p><div class="schema-scroll"><table><thead><tr><th>Establishment</th><th>Address</th><th>New dishes</th></tr></thead><tbody>${result.places.map(p => `<tr><td>${escapeHtml(p.name)} (#${p.id})</td><td>${escapeHtml(p.address || 'Address not listed')}</td><td>${p.newItems}</td></tr>`).join('')}</tbody></table></div><details><summary>Review all ${result.menu.items.length} items and prices</summary><ul>${result.menu.items.map(d => `<li>${escapeHtml(d.name)} — ${d.price === null ? 'Price not listed' : 'SGD ' + escapeHtml(d.price)}</li>`).join('')}</ul></details>${result.conflicts.length ? '<p>Resolve matching dish names in Manage menu before importing.</p>' : ''}</div>`;
     });
   });
   document.getElementById('applyMenuImport').addEventListener('click', async event => {

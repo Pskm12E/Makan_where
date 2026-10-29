@@ -78,13 +78,16 @@ def normalise_menu(data):
             abort(400, "Menu item source IDs and names must be unique within an import.")
         seen_ids.add(identifier.casefold())
         seen_names.add(name.casefold())
-        try:
-            price = Decimal(str(item.get("price")))
-            if not price.is_finite() or not 0 <= price <= 99999999 or price.as_tuple().exponent < -2:
-                raise ValueError()
-        except (InvalidOperation, ValueError):
-            abort(400, "Every item needs a valid nonnegative SGD price with at most two decimal places.")
-        entries.append({"sourceId": identifier, "name": name, "price": format(price, ".2f"),
+        if reference and 'price' in item and item['price'] is None:
+            price = None
+        else:
+            try:
+                price = Decimal(str(item.get("price")))
+                if not price.is_finite() or not 0 <= price <= 99999999 or price.as_tuple().exponent < -2:
+                    raise ValueError()
+            except (InvalidOperation, ValueError):
+                abort(400, "Use a nonnegative SGD price with at most two decimals, or explicit null for an unpriced chain reference item.")
+        entries.append({"sourceId": identifier, "name": name, "price": format(price, ".2f") if price is not None else None,
                         "description": field(item, "description", 1000, False),
                         "dietary": field(item, "dietary", 80, False)})
     return {"sourceName": source, "sourceUrl": url,
@@ -150,12 +153,12 @@ def import_request(actor):
         abort(409, "The menu or catalogue changed after preview. Preview again.")
     if summary["conflicts"]:
         abort(409, "Existing dishes have matching names from another source. Resolve those in Manage menu first.")
-    observed = datetime.fromisoformat(menu["observedAt"]).replace(tzinfo=None)
+    from .catalogue_design import publication_for, bind_offering
+    publication = publication_for(menu) if new else None
     for place_id, item in new:
-        db.session.add(Dish(place_id=place_id, dish_name=item["name"], price=Decimal(item["price"]),
-            description=item["description"], dietary_label=item["dietary"], is_available=True,
-            source_name=menu["sourceName"], source_item_id=item["sourceId"], source_url=menu["sourceUrl"],
-            source_observed_at=observed, is_reference=menu["isReference"]))
+        dish = Dish(place_id=place_id, source_item_id=item['sourceId'], is_available=True)
+        bind_offering(dish, publication, item['sourceId'])
+        db.session.add(dish)
     if new:
         db.session.add(PopulationRun(run_key="menu:" + fingerprint["menu"], details={
             "operation": "menu_import", "sourceName": menu["sourceName"], "sourceUrl": menu["sourceUrl"],

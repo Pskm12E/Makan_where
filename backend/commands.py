@@ -8,6 +8,17 @@ from .routes import save_place
 
 
 def register_commands(app):
+    @app.cli.command('import-menu-highlights')
+    @click.option('--apply', is_flag=True, help='Create reviewable dishes from retained source names; otherwise preview.')
+    def import_menu_highlights_command(apply):
+        from .reference_menus import import_menu_highlights
+        click.echo(json.dumps(import_menu_highlights(apply=apply)))
+
+    @app.cli.command('migrate-design')
+    def migrate_design():
+        from .catalogue_design import upgrade_catalogue_design
+        click.echo(json.dumps(upgrade_catalogue_design()))
+
     @app.cli.command('seed-listing-examples')
     @click.option('--apply', is_flag=True, help='Insert labelled examples; default is preview only.')
     def seed_listing_examples_command(apply):
@@ -100,7 +111,7 @@ def register_commands(app):
         db.create_all()
         from .database_lab import install_views
         install_views()
-        click.echo("17 SQL tables and the catalogue view are ready, including 7 retained legacy community tables. Existing data was preserved.")
+        click.echo(f"{len(db.metadata.tables)} SQL tables and catalogue views are ready. Existing data was preserved.")
 
     @app.cli.command("seed-demo")
     def seed_demo():

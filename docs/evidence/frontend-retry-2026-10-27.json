@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "javascriptSha256": "6fe658a2df3090039e3850a071444a2563b7c3fb9311309c015e55cf15bebe04",
+  "scope": "Actual restaurant.js event handler with mocked DOM and transport; separate from browser/HTTP evidence",
+  "scenario": "POST succeeds, following feed GET fails, same form is submitted again",
+  "postAttempts": 2,
+  "reusedSameRequestKey": true,
+  "simulatedStoredIdentities": 1
+}

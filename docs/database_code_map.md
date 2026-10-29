@@ -38,3 +38,16 @@ The application service uses `PrivateNetwork=yes` and permits Unix sockets only.
 | Reproducible artifact | `scripts/run_database_evaluation.py` | Engine/isolation/topology/platform metadata, test outcomes, source hash, timestamps and limitations; missing-engine skips do not count as success. |
 | Evidence access | `backend/evaluation.py`, `backend/database_lab.py`, `js/database-evaluation.js` | Admin-only recorded evidence; stale/missing records labelled; no browser-triggered load/fault testing against production. |
 | Target-engine release gate | `deploy/install_guest.py` | Run the complete suite in fresh disposable MariaDB/MongoDB databases and save the release's own artifact before activation. |
+
+## Implemented refinement — 27 October 2026
+
+| Responsibility | Current implementation | Evidence |
+| --- | --- | --- |
+| Shared menu facts and outlet overrides | `models.py`, `catalogue_design.py`, `menu_imports.py` | Source publication/item records; stable `dish` offering IDs; exact-source upgrade; old observation dates and outlet edits retained |
+| Flat tag memberships | `Tag`, `PlaceTag`, `FoodPlace.tags` | Composite junction key; cleared legacy list; upgrade/rerun tests |
+| Database domains and moderation states | SQL CHECK/FK rules; SQLite upgrade triggers; `mongo.VALIDATORS` | Direct invalid writes rejected without partial changes |
+| Optimistic post edits | `community.change_content`, If-Match revision predicate | One winner for concurrent same-revision edits; stale edit/removal rejected |
+| Retry-safe content creation | Request key/hash inside the content document plus unique author/key index | Same-key concurrent creates and lost-ack retries retain one ID; changed payload rejected |
+| Restart/restore probe | `scripts/recovery_probe.py`; Docker `recovery` profile | Committed snapshot after graceful restart, typed logical restore into new databases, complete equality and reference audit |
+
+The physical `dish` name is retained for existing references. Its administrator record projection returns effective name/price; stored shared facts and local overrides are inspected in their corresponding fields/tables. The original standalone `design_v2.py` is a teaching prototype; runtime ownership and compatibility semantics are documented in the latest architecture addendum. No distributed SQL/Mongo transaction or entire-schema BCNF proof is claimed.

@@ -84,7 +84,7 @@ def places_json(places):
         "cuisines": [c.cuisine_name for c in p.cuisines],
         "hygieneGrade": p.hygiene_grade or "Not provided",
         "rating": float(ratings.get(p.place_id, 0)),
-        "price": min((float(d.price) for d in p.dishes if d.is_available), default=None),
+        "price": min((float(d.price) for d in p.dishes if d.is_available and d.price is not None), default=None),
         "hasReferenceMenu": any(d.is_reference for d in p.dishes if d.is_available),
         "favouriteCount": saves.get(p.place_id, 0),
         "image": p.image_url, "tags": p.tags, "description": p.description,
@@ -94,10 +94,10 @@ def places_json(places):
         "source": p.source_name, "sourceUrl": p.source_url,
         "sourceFetchedAt": p.source_fetched_at.isoformat() + "Z" if p.source_fetched_at else None,
         "openingHours": p.opening_hours, "isSample": p.is_sample,
-        "menu": [{"id": d.dish_id, "name": d.dish_name, "price": float(d.price),
+        "menu": [{"id": d.dish_id, "name": d.dish_name, "price": float(d.price) if d.price is not None else None,
                   "dietary": d.dietary_label, "description": d.description, "availability": d.is_available,
                   "isReference": d.is_reference, "sourceName": d.source_name, "sourceUrl": d.source_url,
-                  "sourceObservedAt": d.source_observed_at.isoformat() + "Z" if d.source_observed_at else None} for d in p.dishes
+                  "sourceObservedAt": d.source_observed_at.isoformat() + "Z" if d.source_observed_at and not d.menu_edited_at else None} for d in p.dishes
                  if d.is_available or (g.user and g.user.role == "admin")],
     } for p in places]
 

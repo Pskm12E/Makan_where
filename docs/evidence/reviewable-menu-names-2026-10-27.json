@@ -1,0 +1,114 @@
+{
+  "checkedAt": "2026-10-27T11:22:35.789236+00:00",
+  "scope": "Isolated native handover database only; production untouched.",
+  "backup": "work\\evaluation\\before-unpriced-20261027T112212Z.sql",
+  "backupSha256": "3b55e230288dcd65166454205b808dcf516df02e1b8ebd42b6b4d1a097a0dd64",
+  "before": {
+    "dish": 7034,
+    "menu_entry": 105,
+    "menu_publication": 2,
+    "user": 62
+  },
+  "after": {
+    "dish": 13697,
+    "menu_entry": 162,
+    "menu_publication": 4,
+    "user": 62
+  },
+  "firstImport": {
+    "added": 6663,
+    "retained": 0,
+    "venues": 151,
+    "sources": [
+      {
+        "sourceUrl": "https://www.mcdonalds.com.sg/full-menu",
+        "added": 6615,
+        "price": null
+      },
+      {
+        "sourceUrl": "https://www.suki-ya.com.sg/menu",
+        "added": 48,
+        "price": null
+      }
+    ],
+    "applied": true
+  },
+  "repeatImport": {
+    "added": 0,
+    "retained": 6663,
+    "venues": 0,
+    "sources": [
+      {
+        "sourceUrl": "https://www.mcdonalds.com.sg/full-menu",
+        "added": 0,
+        "price": null
+      },
+      {
+        "sourceUrl": "https://www.suki-ya.com.sg/menu",
+        "added": 0,
+        "price": null
+      }
+    ],
+    "applied": true
+  },
+  "allExistingOfferingsPreserved": true,
+  "accountCountPreserved": true,
+  "venue14MenuCount": 45,
+  "venue14AllPricesUnknown": true,
+  "venue14BigMacDishId": 7186,
+  "browser": {
+    "selectableItems": 45,
+    "selectedDish": "Big Mac",
+    "selectedDishId": 7186,
+    "postedReviewId": 726,
+    "savedDishFeedback": [
+      {
+        "id": 7186,
+        "name": "Big Mac",
+        "feedback": "Feedback linked to the selected Big Mac dish."
+      }
+    ],
+    "screenshot": "dish-picker-2026-10-27.png",
+    "scope": "Actual browser form submitted over local HTTP, then independently read back through the content API.",
+    "survivedReload": true,
+    "mobileViewport": {
+      "width": 390,
+      "height": 844,
+      "documentScrollWidth": 375,
+      "selectableItems": 45,
+      "selected": "Big Mac"
+    },
+    "consoleWarningsOrErrors": 0
+  },
+  "files": {
+    "backend/models.py": "c65e995490d3beb3e7887943c633f8a2532c0a9fee738ffc478857cf0bc08311",
+    "backend/reference_menus.py": "38a892634b37ac6a35a70516edfff228c8b3546499f33dadf4611784ead29914",
+    "backend/services.py": "992480f9770b797a973e2366d8f48d643d4a24f852897a132ec416d4266811c9",
+    "backend/analytics.py": "de554ded97a96b0dacb8729ac02b893f2e4d33f82d65136fabc61a9f97f2788e",
+    "backend/menu_imports.py": "0cd5a698aa252d56462e045f841eedc642d5dfb9e05289cb809b6ae901d648a7",
+    "backend/routes.py": "f98c2dc454ac73b0693dfe4440529cc57c2cb9e49fda0a72a96090b81a0e6634",
+    "js/api.js": "8175ff5ac750557b31b92fca4c23bd77873c397f61c0fa9d8a4545e26c7b024a",
+    "js/restaurant.js": "0c40be2ad69a3c843485a5b8621dd4ebc135a29efb679d31fabe59b1ea242fa4",
+    "js/admin.js": "4631c4290278e6236508fac2141edfca98f9ea6e65b7ddcc862dbace5bdf6582"
+  },
+  "fixtureCleanup": {
+    "users": 1,
+    "content": 1,
+    "discoveryEvents": 3,
+    "retainedAccountCount": 62,
+    "scope": "Only the synthetic dish_ui_* account and its related local fixture records. Published dish imports retained."
+  },
+  "laptopSetupRepeat": {
+    "passed": true,
+    "offeringsPreserved": 13697,
+    "accountIdentitiesAndHashesPreserved": 62,
+    "scope": "Native drivers with the private isolated handover configuration, not Docker container execution."
+  },
+  "fullRegression": {
+    "passed": 105,
+    "sourceSha256": "0bc180553c4e43e62b93e4156c26f506cfc9c17980902e5bf00058ded856f15b",
+    "sourceUnchangedDuringRun": true,
+    "artifact": "database-evaluation-2026-10-27-dish-selection-native.json",
+    "seconds": 347.599
+  }
+}

@@ -104,6 +104,21 @@ services:
       test-mongo: {condition: service_healthy}
     volumes: [evidence:/evidence]
 
+  recovery:
+    profiles: [evaluation]
+    image: makanwhere-evaluation:local
+    build:
+      context: .
+      target: evaluation
+    environment:
+      MARIADB_TEST_ADMIN_URL: mysql+pymysql://root:${TEST_SQL_PASSWORD}@test-sql:3306/mysql?charset=utf8mb4
+      MONGODB_TEST_URI: mongodb://evaluation:${TEST_MONGO_PASSWORD}@test-mongo:27017/admin?authSource=admin
+    depends_on:
+      test-sql: {condition: service_healthy}
+      test-mongo: {condition: service_healthy}
+    volumes: [evidence:/evidence]
+    entrypoint: [python, scripts/recovery_probe.py]
+
 volumes:
   sql_data:
   mongo_data:

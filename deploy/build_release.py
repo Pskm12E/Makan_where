@@ -18,7 +18,8 @@ for page in root.glob('*.html'):
         return f'{match.group(1)}="{match.group(2)}?v={digest}"'
     updated = re.sub(r'(src|href)="((?:js|css)/[\w.-]+\.(?:js|css))(?:\?v=[^"\s]+)?"', fingerprint, original)
     if updated != original: page.write_text(updated,encoding='utf-8')
-files = list(root.glob("*.html")) + [root/'pytest.ini', root/'README.md', root/'.env.example', root/'compose.yaml']
+files = list(root.glob("*.html")) + [root/'pytest.ini', root/'README.md', root/'.env.example', root/'compose.yaml',
+    root/'Dockerfile', root/'compose.laptop.yaml', root/'.dockerignore']
 for directory in ["backend", "js", "css", "assets", "database", "tests", "deploy", "scripts"]:
     files.extend(p for p in (root / directory).rglob("*") if p.is_file() and "__pycache__" not in p.parts)
 # The real source path is used by population and studio evidence on the server.

@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/style.css?v=2d0c85c8c44b" />
+    <link rel="stylesheet" href="css/schema-diagram.css?v=7aaacbff0780" />
+    <link rel="stylesheet" href="css/inline-actions.css?v=16a340e4d9c5" />
   </head>
   <body>
     <header class="topbar">
@@ -121,17 +123,67 @@
         <section id="panel-reports" hidden aria-label="Content moderation"><div id="moderationReports"></div></section>
 
         <section id="panel-schema" hidden aria-label="Database schema">
-          <div class="results-header"><div><h2>Database schema</h2><p>Read-only structure from the connected database. Select a table to inspect its columns and relationships.</p></div><button id="refreshSchemaBtn" class="secondary-btn" type="button">Refresh schema</button></div>
+          <div class="results-header"><div><h2>Database schema</h2><p>Explore how your data connects. Select a table in the diagram to understand its keys and relationships.</p></div><button id="refreshSchemaBtn" class="secondary-btn" type="button">Refresh schema</button></div>
           <div id="schemaSummary" class="schema-summary"></div>
-          <p class="schema-plan"><strong>MongoDB: active.</strong> Community collections, validators and indexes are shown in the <a href="database-lab.html">Database evidence</a>.</p>
+          <div class="schema-live-bar">
+            <label><input id="schemaAutoRefresh" type="checkbox" checked disabled /> Live updates every 10 seconds</label>
+            <p id="schemaLiveStatus" role="status">Waiting for the first database read.</p>
+          </div>
+          <p id="schemaStructureStatus">Editing records changes stored values. Tables, columns and keys change only when the database structure changes.</p>
+          <details id="schemaEditor" class="schema-editor" open>
+            <summary>Edit tables, columns &amp; relationships</summary>
+            <p>Create <code>custom_…</code> tables, add nullable columns, and define foreign keys in the connected SQL database. New columns on application tables use the <code>custom_</code> prefix.</p>
+            <form id="schemaEditForm" class="schema-edit-form">
+              <label>Operation<select id="schemaEditOperation" disabled><option value="create_table">Create table</option><option value="add_column">Add column</option><option value="add_foreign_key">Add foreign key</option></select></label>
+              <label id="schemaEditNameField">New table name<input id="schemaEditName" placeholder="custom_booking" maxlength="48" disabled /></label>
+              <label id="schemaEditTableField" hidden>Table<select id="schemaEditTable" disabled></select></label>
+              <label><span id="schemaEditColumnLabel">Primary key name</span><input id="schemaEditColumn" value="id" maxlength="48" disabled /></label>
+              <label id="schemaEditTypeField" hidden>Data type<select id="schemaEditType" disabled><option value="integer">Integer</option><option value="text">Text (255 characters)</option><option value="decimal">Decimal (10, 2)</option><option value="boolean">Boolean</option><option value="datetime">Date and time</option></select></label>
+              <label id="schemaEditParentField" hidden>Referenced table<select id="schemaEditParent" disabled></select></label>
+              <label id="schemaEditParentColumnField" hidden>Referenced primary key<select id="schemaEditParentColumn" disabled></select></label>
+              <button id="schemaPreviewBtn" type="submit" class="secondary-btn" disabled>Preview SQL</button>
+            </form>
+            <div id="schemaEditPreview" hidden>
+              <p id="schemaEditDescription"></p>
+              <pre><code id="schemaEditSQL"></code></pre>
+              <p>This changes the database structure and commits immediately. Review the statement, then apply it. New fields and tables appear in the diagram; app forms require separate code changes to use them.</p>
+              <button id="schemaApplyBtn" class="small-action" type="button">Apply schema change</button>
+            </div>
+            <p id="schemaEditStatus" role="status">Loading the connected schema…</p>
+          </details>
+          <section id="schemaDiagram" class="schema-diagram" aria-label="Interactive database diagram">
+            <p role="status">Open Database schema to load the relationship diagram.</p>
+          </section>
+          <section id="schemaRecords" class="schema-records" aria-label="Live database records">
+            <h3>Live records</h3>
+            <p>Keep this page open while you edit the app in another tab. Select a diagram table to inspect its saved values here.</p>
+            <form id="schemaRecordFilter" class="schema-record-filter">
+              <label>Table or collection<select id="schemaRecordTable" disabled>
+                <optgroup label="SQL"><option value="sql:dish">dish</option><option value="sql:food_place">food_place</option><option value="sql:favourite">favourite</option><option value="sql:place_cuisine">place_cuisine</option><option value="sql:area">area</option><option value="sql:category">category</option><option value="sql:cuisine">cuisine</option><option value="sql:user">user</option><option value="sql:discovery_event">discovery_event</option><option value="sql:population_run">population_run</option></optgroup>
+                <optgroup label="MongoDB"><option value="mongo:content">content</option><option value="mongo:upvotes">upvotes</option><option value="mongo:reports">reports</option><option value="mongo:counters">counters</option></optgroup>
+              </select></label>
+              <label>Record key <span id="schemaRecordKeyHint">dish_id; blank for highest 20 IDs</span><input id="schemaRecordKey" maxlength="301" placeholder="For example: 1" disabled /></label>
+              <button type="submit" class="secondary-btn" disabled>Watch records</button>
+            </form>
+            <p id="schemaRecordStatus" role="status"></p>
+            <p id="schemaRecordChange" role="status"></p>
+            <div id="schemaRecordRows" class="schema-scroll"></div>
+            <p class="schema-record-note">Highlighted cells changed since the previous read in this view. Counts include archived or removed records. Each database is read separately; this is a live inspection view, not a transaction log.</p>
+          </section>
+          <h3 id="schemaColumnHeading" class="schema-column-heading">All SQL tables &amp; columns</h3>
+          <p>The detailed structure includes retained migration tables. Community content is now stored in MongoDB.</p>
           <label class="schema-search">Find a table or column<input type="search" id="schemaSearch" placeholder="For example: food_place or place_id" /></label>
           <div id="schemaTables" class="schema-tables" aria-live="polite"></div>
         </section>
       </section>
     </main>
 
-    <script src="js/api.js?v=31aaa4aa5fa6"></script>
+    <script src="js/api.js?v=8175ff5ac750"></script>
+    <script src="js/inline-actions.js?v=d033e9b3b475"></script>
     <script src="js/auth.js?v=3f3ce9f00478"></script>
-    <script src="js/admin.js?v=7f233faae9be"></script>
+    <script src="js/schema-diagram.js?v=1c301c99aeac"></script>
+    <script src="js/schema-live.js?v=2dd9e676ed3c"></script>
+    <script src="js/schema-editor.js?v=5fb8c0d0b4e7"></script>
+    <script src="js/admin.js?v=4631c4290278"></script>
   </body>
 </html>

@@ -27,7 +27,7 @@ def test_schema_requires_admin_and_reflects_only_live_application_tables(app):
     assert response.headers['Cache-Control'] == 'no-store'
     result = response.json
     tables = {table['name']: table for table in result['tables']}
-    assert len(tables) == 17 and 'unrelated_private_table' not in tables
+    assert len(tables) == 21 and 'unrelated_private_table' not in tables
     assert any(c['name'] == 'inspection_note' for c in tables['area']['columns'])
     assert tables['favourite']['primaryKey'] == ['user_id', 'place_id']
     assert any(f['table'] == 'food_place' for f in tables['dish']['foreignKeys'])
@@ -53,6 +53,49 @@ def test_admin_signin_enforces_role_without_creating_admin_accounts(app):
     admin.csrf = admin.client.get('/api/session').json['csrfToken']
     response = admin.send('POST', '/api/login', {**credentials, 'identity': 'administrator'})
     assert response.status_code == 200 and response.json['user']['role'] == 'admin'
+
+
+def test_schema_records_are_admin_only_bounded_and_exclude_private_fields(app):
+    guest, user, admin = Browser(app), Browser(app, 'record_reader'), administrator(app)
+    path = '/api/admin/schema-records'
+    assert guest.client.get(path).status_code == 401
+    assert user.client.get(path).status_code == 403
+    assert admin.send('POST', path, {}).status_code == 405
+    for query in ('store=other', 'table=content', 'table=unrelated_private_table', 'table=dish&key=1%20OR%201=1',
+                  'table=favourite&key=1', 'store=mongo&table=upvotes&key=1,nope'):
+        assert admin.client.get(path + '?' + query).status_code == 400
+    result = admin.client.get(path + '?table=user')
+    assert result.headers['Cache-Control'] == 'no-store'
+    selection = result.json['selection']
+    assert selection['columns'] == ['user_id', 'display_name', 'role']
+    assert len(selection['rows']) <= 20
+    assert not any(name in json.dumps(selection) for name in ('password_hash', 'email', 'phone', 'UniqueTestPassword'))
+    assert set(result.json['sqlCounts']) == {'area', 'category', 'cuisine', 'dish', 'food_place', 'place_cuisine', 'user', 'favourite', 'discovery_event', 'population_run', 'tag', 'place_tag', 'menu_publication', 'menu_entry'}
+
+
+def test_schema_records_follow_committed_sql_and_mongo_changes(app):
+    admin = administrator(app)
+    path = '/api/admin/schema-records'
+    structure = admin.client.get('/api/admin/schema').json['tables']
+    before = admin.client.get(path + '?table=dish&key=1').json
+    assert admin.send('PATCH', '/api/admin/establishments/1/dishes/1', {'name': 'Watched dish', 'price': '7.25'}).status_code == 200
+    after = admin.client.get(path + '?table=dish&key=1').json
+    assert before['selection']['rows'] != after['selection']['rows']
+    assert after['selection']['rows'][0]['price'] == '7.25'
+    assert before['sqlCounts']['dish'] == after['sqlCounts']['dish']
+    assert admin.client.get('/api/admin/schema').json['tables'] == structure
+    assert admin.send('PUT', '/api/favourites/1').status_code == 200
+    favourite = admin.client.get(path + f'?table=favourite&key={admin.user["id"]},1').json
+    assert favourite['selection']['rows'][0]['place_id'] == 1
+    assert admin.send('DELETE', '/api/favourites/1').status_code == 200
+    assert not admin.client.get(path + f'?table=favourite&key={admin.user["id"]},1').json['selection']['rows']
+    content_id = admin.review()
+    mongo = admin.client.get(path + f'?store=mongo&table=content&key={content_id}').json
+    assert mongo['selection']['rows'][0]['rating'] == 5
+    with app.app_context():
+        community_db().content.update_one({'_id': content_id}, {'$set': {'body': 'Updated saved review'}})
+    assert admin.client.get(path + f'?store=mongo&table=content&key={content_id}').json['selection']['rows'][0]['body'] == 'Updated saved review'
+    assert not admin.client.get(path + '?table=dish&key=2147483647').json['selection']['rows']
 
 
 def test_dish_changes_require_admin_csrf_and_matching_place(app):

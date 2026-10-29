@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "sourceSha256": "470d2adc69f500fd063e37e7f8c15aa26d13061e0d09c9a17265ecba831005c7",
+  "sqlVersion": "11.4.13-MariaDB",
+  "mongoVersion": "8.0.19",
+  "snapshotSha256": "92023d30640b3a9a7ef5fe6ef4ea5008e2ae638b8498a22c83db6db8f057309b",
+  "persistedAfterReconnect": true,
+  "completeLogicalRestoreEqual": true,
+  "restoredReferenceErrors": 0,
+  "sqlUptimeBefore": 337,
+  "sqlUptimeAfter": 4,
+  "mongoUptimeBefore": 337.0,
+  "mongoUptimeAfter": 3.0,
+  "restartObserved": true,
+  "verifiedAt": "2026-10-27T10:43:37.478740+00:00",
+  "limits": [
+    "Graceful restart, not power-loss or forced crash recovery.",
+    "Known application schema and quiescent synthetic data; not a concurrent production backup.",
+    "SQL/Mongo consistency requires stopped writes and a matching backup pair."
+  ]
+}

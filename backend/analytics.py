@@ -38,14 +38,14 @@ def insight_queries():
             FoodPlace.place_name.label("place"), FoodPlace.place_id.label("placeId"),
             FoodPlace.is_sample.label("isSample")
         ).join(FoodPlace, FoodPlace.place_id == Dish.place_id).where(
-            active, Dish.is_available.is_(True)
+            active, Dish.is_available.is_(True), Dish.price.is_not(None)
         ).order_by(Dish.price, Dish.dish_id).limit(3),
         "affordableMenus": select(
             FoodPlace.place_id.label("id"), FoodPlace.place_name.label("name"),
             mean_price.label("averagePrice"), func.count(Dish.dish_id).label("dishCount"),
             FoodPlace.is_sample.label("isSample")
         ).join(Dish, Dish.place_id == FoodPlace.place_id).where(
-            active, Dish.is_available.is_(True)
+            active, Dish.is_available.is_(True), Dish.price.is_not(None)
         ).group_by(FoodPlace.place_id, FoodPlace.place_name, FoodPlace.is_sample).having(
             mean_price <= Decimal("12.00")
         ).order_by(mean_price, FoodPlace.place_id).limit(3),

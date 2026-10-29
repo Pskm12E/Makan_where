@@ -1,6 +1,8 @@
 # An allowlist keeps private config, databases, archives and reports out of images.
 **
 !Dockerfile
+!.dockerignore
+!compose.laptop.yaml
 !backend/
 !backend/*.py
 !backend/requirements.txt

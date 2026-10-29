@@ -40,7 +40,7 @@ for table in db.metadata.sorted_tables:
         'indexes': sorted([{'name': i.name, 'columns': list(i.columns.keys()), 'unique': i.unique}
                           for i in table.indexes], key=lambda i:i['name'])
     })
-assert len(live)==10 and len(tables)==17
+assert len(live)==14 and len(tables)==21
 assert sum(t['role']=='legacy migration source' for t in tables)==7
 snapshot={'source':'SQLAlchemy declarations, MongoDB validators and application write paths; no database connection',
           'tables':tables,'view':{'name':'catalogue_menu_summary','query':constants['VIEW_SQL']},
@@ -70,7 +70,7 @@ def mermaid(selected):
     return '\n'.join(lines)
 
 lines=['# Makan Where relational design reference','',
-       f'The current code declares **17 SQL tables and {sum(len(t["columns"]) for t in tables)} columns**: ten active tables and seven retained community migration tables. Live reviews, threads, comments, votes and reports are stored in MongoDB. This reference describes code declarations; it does not claim a live MariaDB deployment was inspected.','',
+       f'The current code declares **21 SQL tables and {sum(len(t["columns"]) for t in tables)} columns**: fourteen active tables and seven retained community migration tables. The dish table preserves outlet identities and stores overrides; menu_publication/menu_entry hold shared facts. Live community content is in MongoDB. This describes source declarations, not a live deployment inspection.','',
        'Regenerate with `.venv/Scripts/python scripts/export_database_model.py`. Canonical sources: `backend/models.py`, `backend/mongo.py`, `backend/community.py`, `backend/community_migration.py`, `backend/population.py` and `backend/database_lab.py`.','',
        'The [schema diagram PDF](assets/database-model-full.pdf) records the earlier 87-column model, before dish provenance and listing enrichment were added. The current generated diagrams and dictionary below include those fields. The cloud report is not changed by this exporter.','',
        '## Active relational model','',

@@ -26,7 +26,7 @@ def test_lab_auth_live_metadata_probes_and_no_private_material(app):
     assert result.status_code == 200, result.json
     assert result.json['mongo']['version']
     assert list(result.json['mongo']['pipeline'][2]['$sort']) == ['rating', 'reviewCount', '_id']
-    assert len(result.json['schema']['tables']) == 17
+    assert len(result.json['schema']['tables']) == 21
     assert len(result.json['queries']['queries']) == 6
     assert 'NOT (EXISTS' in result.json['queries']['queries'][0]['sql']
     assert all(r['orphans'] == 0 for r in result.json['audit']['sqlForeignKeys'])
@@ -192,7 +192,8 @@ def test_mongo_feed_seek_pagination_has_no_lost_or_repeated_documents(app):
     cid = user.review()
     with app.app_context():
         original = community_db().content.find_one({'_id': cid})
-        community_db().content.insert_many([{**original, '_id': cid + offset} for offset in range(1, 205)])
+        community_db().content.insert_many([{**original, '_id': cid + offset,
+            'request_key': f'pagination-fixture-request-{offset}'} for offset in range(1, 205)])
     seen, cursor = [], 0
     for _ in range(3):
         result = user.client.get(f'/api/content?place_id=1&cursor={cursor}').json

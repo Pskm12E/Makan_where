@@ -31,6 +31,7 @@ def main():
     group.add_argument('--serve', action='store_true')
     group.add_argument('--test', action='store_true')
     group.add_argument('--migrate-menus', action='store_true')
+    group.add_argument('--migrate-design', action='store_true')
     group.add_argument('--enrich-listings', action='store_true')
     parser.add_argument('--apply', action='store_true', help='Apply the reviewed listing enrichment after preview.')
     parser.add_argument('--port', default=5055, type=int)
@@ -46,6 +47,12 @@ def main():
     from backend.passwords import hash_password
     from sqlalchemy import select
     app = create_app()
+    if args.migrate_design:
+        result = app.test_cli_runner().invoke(args=['migrate-design'])
+        print(result.output)
+        if result.exit_code:
+            raise SystemExit('Design upgrade failed; inspect the retained data before retrying.')
+        return
     if args.enrich_listings:
         runner = app.test_cli_runner()
         migration = runner.invoke(args=['migrate-details'])
@@ -64,7 +71,7 @@ def main():
         return
     if args.setup:
         runner = app.test_cli_runner()
-        for command in ['migrate-menus', 'migrate-details', 'init-db', 'init-mongo', 'migrate-community', 'seed-coursework', 'enrich-listings --apply']:
+        for command in ['migrate-menus', 'migrate-details', 'migrate-design', 'init-db', 'init-mongo', 'migrate-community', 'seed-coursework', 'enrich-listings --apply', 'import-menu-highlights --apply']:
             result = runner.invoke(args=command.split())
             if result.exit_code:
                 print(result.output)

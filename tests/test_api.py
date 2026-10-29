@@ -59,8 +59,15 @@ class Browser:
             assert response.status_code == 201, response.json
             self.user = response.json['user']
 
-    def send(self, method, path, data=None):
-        response = self.client.open(path, method=method, json=data, headers={"X-CSRF-Token": self.csrf})
+    def send(self, method, path, data=None, headers=None):
+        import re
+        supplied = dict(headers or {})
+        if method == 'POST' and path in ('/api/content', '/api/reviews'):
+            supplied.setdefault('Idempotency-Key', uuid.uuid4().hex)
+        if method in ('PATCH', 'DELETE') and re.fullmatch(r'/api/content/[0-9]+', path) and 'If-Match' not in supplied:
+            current = self.client.get(path)
+            supplied['If-Match'] = str(current.json.get('content', {}).get('revision', 1))
+        response = self.client.open(path, method=method, json=data, headers={"X-CSRF-Token": self.csrf, **supplied})
         if response.is_json and response.json.get('csrfToken'):
             self.csrf = response.json['csrfToken']
         return response
@@ -205,7 +212,7 @@ def test_discovery_guests_and_constraints(app):
     assert guest.client.get('/api/analytics').json['discovery'] == {'search':1,'place_view':1}
     with app.app_context():
         assert all(event.user_id is None for event in db.session.scalars(select(DiscoveryEvent)))
-        assert len(db.metadata.tables) == 17
+        assert len(db.metadata.tables) == 21
 
 
 def test_pagination_and_initialization_preserves_data(app):

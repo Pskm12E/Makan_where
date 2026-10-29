@@ -1,0 +1,187 @@
+{
+  "sourceSha256": "470d2adc69f500fd063e37e7f8c15aa26d13061e0d09c9a17265ecba831005c7",
+  "engine": "native MariaDB 11.4.13 + MongoDB 8.0.19",
+  "before": {
+    "sql": {
+      "area": 15,
+      "category": 5,
+      "cuisine": 212,
+      "place_cuisine": 5290,
+      "food_place": 8421,
+      "tag": 17,
+      "place_tag": 18,
+      "menu_publication": 2,
+      "menu_entry": 105,
+      "dish": 7034,
+      "user": 62,
+      "favourite": 120,
+      "content": 0,
+      "review": 0,
+      "thread": 0,
+      "comment": 0,
+      "content_dish": 0,
+      "upvote": 0,
+      "report": 0,
+      "discovery_event": 301,
+      "population_run": 4
+    },
+    "mongo": {
+      "content": 721,
+      "upvotes": 600,
+      "reports": 20
+    }
+  },
+  "after": {
+    "sql": {
+      "area": 15,
+      "category": 5,
+      "cuisine": 212,
+      "place_cuisine": 5290,
+      "food_place": 8421,
+      "tag": 17,
+      "place_tag": 18,
+      "menu_publication": 2,
+      "menu_entry": 105,
+      "dish": 7034,
+      "user": 62,
+      "favourite": 120,
+      "content": 0,
+      "review": 0,
+      "thread": 0,
+      "comment": 0,
+      "content_dish": 0,
+      "upvote": 0,
+      "report": 0,
+      "discovery_event": 301,
+      "population_run": 4
+    },
+    "mongo": {
+      "content": 721,
+      "upvotes": 600,
+      "reports": 20
+    }
+  },
+  "businessCountsIdentical": true,
+  "accountHashesRetained": true,
+  "allEffectiveMenuRowsIdentical": true,
+  "sharedPublications": 2,
+  "sharedEntries": 105,
+  "sharedOfferings": 7016,
+  "copiedSharedPayloads": 0,
+  "audit": {
+    "sqlForeignKeys": [
+      {
+        "reference": "discovery_event \u2192 user",
+        "orphans": 0
+      },
+      {
+        "reference": "discovery_event \u2192 food_place",
+        "orphans": 0
+      },
+      {
+        "reference": "dish \u2192 food_place",
+        "orphans": 0
+      },
+      {
+        "reference": "dish \u2192 menu_entry",
+        "orphans": 0
+      },
+      {
+        "reference": "favourite \u2192 food_place",
+        "orphans": 0
+      },
+      {
+        "reference": "favourite \u2192 user",
+        "orphans": 0
+      },
+      {
+        "reference": "food_place \u2192 area",
+        "orphans": 0
+      },
+      {
+        "reference": "food_place \u2192 category",
+        "orphans": 0
+      },
+      {
+        "reference": "menu_entry \u2192 menu_publication",
+        "orphans": 0
+      },
+      {
+        "reference": "place_cuisine \u2192 food_place",
+        "orphans": 0
+      },
+      {
+        "reference": "place_cuisine \u2192 cuisine",
+        "orphans": 0
+      },
+      {
+        "reference": "place_tag \u2192 tag",
+        "orphans": 0
+      },
+      {
+        "reference": "place_tag \u2192 food_place",
+        "orphans": 0
+      }
+    ],
+    "duplicateSourceIdentities": 0,
+    "potentialSameNameAddress": [
+      {
+        "place_name": "An A\u00e7ai Affair",
+        "address": "3 Gateway Drive",
+        "count": 2
+      },
+      {
+        "place_name": "Bedok 216 Hawker Centre",
+        "address": "216 Bedok North Street 1, Singapore 460216",
+        "count": 2
+      },
+      {
+        "place_name": "Jia Xiang Sarawak Kolo Mee",
+        "address": "Singapore 039594",
+        "count": 2
+      },
+      {
+        "place_name": "Kak Wan's Kitchen",
+        "address": "Joo Chiat Road",
+        "count": 2
+      },
+      {
+        "place_name": "KFC",
+        "address": "80 Mandai Lake Road",
+        "count": 2
+      },
+      {
+        "place_name": "McDonald's",
+        "address": "Clementi Avenue 3",
+        "count": 2
+      },
+      {
+        "place_name": "Seng Kee Black Chicken Herbal Soup",
+        "address": "Changi Road",
+        "count": 2
+      },
+      {
+        "place_name": "Starbucks",
+        "address": "80 Marine Parade Road #01-10A/B Parkway Parade, Singapore 449269",
+        "count": 2
+      },
+      {
+        "place_name": "Ya Kun Family Cafe",
+        "address": "#01-14B 80 Marine Parade Rd, Parkway Parade, Singapore 449269",
+        "count": 2
+      }
+    ],
+    "potentialDuplicateNote": "Same name/address is a review candidate, not proof of duplication. Separate OSM nodes/ways and branches may be legitimate; no automatic deletion.",
+    "mongoReferences": {
+      "authors": 0,
+      "places": 0,
+      "dishLinks": 0,
+      "threadLinks": 0,
+      "votes": 0,
+      "reports": 0
+    },
+    "duplicateVoteGroups": 0,
+    "boundary": "MongoDB cannot enforce a foreign key into SQL. Application checks, soft deletion and this reconciliation audit cover that boundary; no cross-engine ACID transaction is claimed."
+  },
+  "note": "Counts include one retained, soft-removed synthetic HTTP smoke-test post. No production data used."
+}

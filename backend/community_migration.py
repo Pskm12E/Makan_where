@@ -45,7 +45,17 @@ def migrate_community():
             if old and old.get('legacy_checksum') != checksum:
                 raise ValueError(f'Migration conflict in {collection}; destination data preserved.')
             if not old:
-                pending.append((collection, {**item, 'legacy_checksum': checksum}))
+                normalized = dict(item)
+                if collection == 'reports':
+                    fields = ('resolved_by_id', 'resolved_at', 'resolution_note')
+                    if item['status'] == 'open':
+                        if any(item.get(k) is not None for k in fields):
+                            raise ValueError(f'Legacy open report {item["_id"]} has resolution facts; repair before migration.')
+                        for key in fields:
+                            normalized.pop(key, None)
+                    elif any(not item.get(k) for k in fields):
+                        raise ValueError(f'Legacy resolved report {item["_id"]} is incomplete; repair before migration.')
+                pending.append((collection, {**normalized, 'legacy_checksum': checksum}))
     for collection, item in pending:
         mongo[collection].insert_one(item)
     for collection in ('content', 'reports'):

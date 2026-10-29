@@ -20,7 +20,9 @@ DOMAIN = 'makanwhere.4bytedigi.com'
 ROOT_URL = f'mysql+pymysql://root@localhost/{SCHEMA}?unix_socket=/run/mysqld/mysqld.sock&charset=utf8mb4'
 ROOT = Path('/srv/makanwhere')
 CONFIG = Path('/etc/makanwhere/app.env')
-BASE_TABLES = ['area','category','cuisine','food_place','place_cuisine','dish','user','favourite','content','review','thread','comment','content_dish','upvote','report','discovery_event','population_run']
+BASE_TABLES = ['area','category','cuisine','food_place','place_cuisine','dish','user','favourite','content','review','thread','comment','content_dish','upvote','report','discovery_event','population_run',
+               'tag','place_tag','menu_publication','menu_entry']
+READ_ONLY_VIEWS = ['catalogue_menu_summary', 'catalogue_effective_menu']
 SERVICE = Path('/etc/systemd/system/makanwhere.service')
 SITE = Path('/etc/nginx/sites-available/makanwhere')
 LINK = Path('/etc/nginx/sites-enabled/makanwhere')
@@ -229,7 +231,7 @@ def main():
         with (backup / 'project.sql').open('wb') as target:
             run(['mariadb-dump','--single-transaction','--databases',SCHEMA], stdout=target)
         backup_data(backup / 'mongo-data')
-        for command in ['migrate-catalogue','migrate-menus','migrate-details','init-db','init-mongo','migrate-community','seed-coursework','enrich-listings --apply']:
+        for command in ['migrate-catalogue','migrate-menus','migrate-details','migrate-design','init-db','init-mongo','migrate-community','seed-coursework','enrich-listings --apply','import-menu-highlights --apply']:
             result = subprocess.run(['python3','-m','flask','--app','backend.app',*command.split()], cwd=release,
                          env=admin_env, capture_output=True, text=True)
             (backup / (command + '.log')).write_text(result.stdout + result.stderr)
@@ -237,7 +239,11 @@ def main():
             print(command + ': completed', flush=True)
         for table in BASE_TABLES:
             sql(f"GRANT SELECT,INSERT,UPDATE,DELETE ON `{SCHEMA}`.`{table}` TO 'makanwhere'@'localhost';")
-        sql(f"GRANT SELECT ON `{SCHEMA}`.`catalogue_menu_summary` TO 'makanwhere'@'localhost';")
+        for view in READ_ONLY_VIEWS:
+            sql(f"GRANT SELECT ON `{SCHEMA}`.`{view}` TO 'makanwhere'@'localhost';")
+        # Additive schema editor. Row SELECT remains table-scoped; custom-table
+        # reflection uses INFORMATION_SCHEMA, not access to unrelated row data.
+        sql(f"GRANT CREATE,ALTER,REFERENCES ON `{SCHEMA}`.* TO 'makanwhere'@'localhost';")
         write_environment(config)
         result = run(['python3',str(release / 'deploy/verify_release.py'),str(release)],
                      env=dict(os.environ, PYTHONPATH=str(vendor)), capture_output=True, text=True)

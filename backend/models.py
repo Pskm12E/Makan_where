@@ -1,10 +1,12 @@
-"""10 live SQL tables plus 7 retained legacy community migration tables.
+"""14 live SQL tables plus 7 retained legacy community migration tables.
 Derived prices and ratings are queried, never stored. Live community is MongoDB.
 """
 from datetime import datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData, event
 from sqlalchemy.engine import Engine
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import select, case, func
 import sqlite3
 
 db = SQLAlchemy(metadata=MetaData(naming_convention={
@@ -63,7 +65,7 @@ class FoodPlace(db.Model):
     image_url = db.Column(db.String(1000), nullable=False, default="")
     enrichment = db.Column(db.JSON, nullable=True)
     hygiene_grade = db.Column(db.String(1))
-    tags = db.Column(db.JSON, nullable=False, default=list)
+    legacy_tags = db.Column('tags', db.JSON, nullable=False, default=list)
     archived_at = db.Column(db.DateTime)
     source_name = db.Column(db.String(40))
     source_id = db.Column(db.String(80))
@@ -71,30 +73,151 @@ class FoodPlace(db.Model):
     source_fetched_at = db.Column(db.DateTime)
     opening_hours = db.Column(db.String(1000))
     is_sample = db.Column(db.Boolean, nullable=False, default=False, server_default="0")
-    __table_args__ = (db.UniqueConstraint("source_name", "source_id", name="uq_food_place_source"),)
+    __table_args__ = (
+        db.UniqueConstraint("source_name", "source_id", name="uq_food_place_source"),
+        db.CheckConstraint('latitude IS NULL OR latitude BETWEEN -90 AND 90', name='ck_place_latitude'),
+        db.CheckConstraint('longitude IS NULL OR longitude BETWEEN -180 AND 180', name='ck_place_longitude'),
+        db.CheckConstraint("hygiene_grade IS NULL OR hygiene_grade IN ('A','B','C','D')", name='ck_place_hygiene'),
+    )
     area = db.relationship(Area)
     category = db.relationship(Category)
     cuisines = db.relationship(Cuisine, secondary="place_cuisine", lazy="selectin")
     dishes = db.relationship("Dish", lazy="selectin")
+    tag_records = db.relationship('Tag', secondary='place_tag', lazy='selectin', order_by='Tag.tag_name')
+
+    @property
+    def tags(self):
+        return [tag.tag_name for tag in self.tag_records] or self.legacy_tags or []
+
+    @tags.setter
+    def tags(self, names):
+        if not isinstance(names, list) or any(not isinstance(n, str) or not n.strip() or len(n.strip()) > 80 for n in names):
+            raise ValueError('Tags must be a list of nonempty names up to 80 characters.')
+        records = []
+        with db.session.no_autoflush:
+            for name in sorted(set(n.strip() for n in names)):
+                tag = next((t for t in db.session.new if isinstance(t, Tag) and t.tag_name == name), None)
+                tag = tag or db.session.scalar(select(Tag).where(Tag.tag_name == name))
+                if tag is None:
+                    tag = Tag(tag_name=name)
+                    db.session.add(tag)
+                records.append(tag)
+        self.tag_records = records
+        self.legacy_tags = []
+
+
+class Tag(db.Model):
+    tag_id = db.Column(db.Integer, primary_key=True)
+    tag_name = db.Column(db.String(80), nullable=False, unique=True)
+
+
+class PlaceTag(db.Model):
+    place_id = db.Column(db.Integer, db.ForeignKey('food_place.place_id'), primary_key=True)
+    tag_id = db.Column(db.Integer, db.ForeignKey('tag.tag_id'), primary_key=True)
+
+
+class MenuPublication(db.Model):
+    publication_id = db.Column(db.Integer, primary_key=True)
+    source_name = db.Column(db.String(80), nullable=False)
+    source_url = db.Column(db.String(500), nullable=False)
+    observed_at = db.Column(db.DateTime, nullable=False)
+    payload_sha256 = db.Column(db.String(64), nullable=False, unique=True)
+    is_reference = db.Column(db.Boolean, nullable=False)
+
+
+class MenuEntry(db.Model):
+    publication_id = db.Column(db.Integer, db.ForeignKey('menu_publication.publication_id'), primary_key=True)
+    source_item_id = db.Column(db.String(100), primary_key=True)
+    item_name = db.Column(db.String(150), nullable=False)
+    description = db.Column(db.Text, nullable=False, default='')
+    # A published item can be reviewable even when its source omits a price.
+    reference_price = db.Column(db.Numeric(10, 2), nullable=True)
+    dietary_label = db.Column(db.String(80), nullable=False, default='')
+    publication = db.relationship(MenuPublication, lazy='joined')
+    __table_args__ = (db.CheckConstraint('reference_price >= 0', name='ck_entry_price'),)
+
+
+def menu_value(name, entry_name):
+    """Effective attribute: shared source fact plus optional outlet override."""
+    def get(self):
+        if self.menu_entry is None:
+            return getattr(self, 'legacy_' + name)
+        override = getattr(self, name + '_override')
+        return override if override is not None else getattr(self.menu_entry, entry_name)
+
+    def set_value(self, value):
+        if self.menu_entry is None:
+            setattr(self, 'legacy_' + name, value)
+        else:
+            setattr(self, name + '_override', value if value != getattr(self.menu_entry, entry_name) else None)
+
+    def expression(cls):
+        shared = select(getattr(MenuEntry, entry_name)).where(
+            MenuEntry.publication_id == cls.publication_id,
+            MenuEntry.source_item_id == cls.source_item_id).correlate(cls).scalar_subquery()
+        return case((cls.publication_id.is_not(None), func.coalesce(getattr(cls, name + '_override'), shared)),
+                    else_=getattr(cls, 'legacy_' + name)).label(name)
+    return hybrid_property(get, set_value, expr=expression)
+
+
+def publication_value(name, publication_name):
+    def get(self):
+        if name == 'source_observed_at' and self.menu_edited_at:
+            return None
+        return getattr(self.menu_entry.publication, publication_name) if self.menu_entry else getattr(self, 'legacy_' + name)
+
+    def set_value(self, value):
+        setattr(self, 'legacy_' + name, value)
+        if self.menu_entry and name == 'source_observed_at':
+            self.menu_edited_at = now()
+
+    def expression(cls):
+        shared = select(getattr(MenuPublication, publication_name)).where(
+            MenuPublication.publication_id == cls.publication_id).correlate(cls).scalar_subquery()
+        clauses = [(cls.publication_id.is_not(None), shared)]
+        if name == 'source_observed_at':
+            clauses.insert(0, (cls.menu_edited_at.is_not(None), None))
+        return case(*clauses, else_=getattr(cls, 'legacy_' + name)).label(name)
+    return hybrid_property(get, set_value, expr=expression)
 
 
 class Dish(db.Model):
     __tablename__ = "dish"
     dish_id = db.Column(db.Integer, primary_key=True)
     place_id = db.Column(db.Integer, db.ForeignKey("food_place.place_id"), nullable=False, index=True)
-    dish_name = db.Column(db.String(150), nullable=False)
-    description = db.Column(db.Text, nullable=False, default="")
-    price = db.Column(db.Numeric(10, 2), nullable=False)
+    legacy_dish_name = db.Column('dish_name', db.String(150), nullable=False, default='')
+    legacy_description = db.Column('description', db.Text, nullable=False, default="")
+    legacy_price = db.Column('price', db.Numeric(10, 2), nullable=False, default=0)
     is_available = db.Column(db.Boolean, nullable=False, default=True)
-    dietary_label = db.Column(db.String(80), nullable=False, default="")
-    source_name = db.Column(db.String(80))
+    legacy_dietary_label = db.Column('dietary_label', db.String(80), nullable=False, default="")
+    legacy_source_name = db.Column('source_name', db.String(80))
     source_item_id = db.Column(db.String(100))
-    source_url = db.Column(db.String(500))
-    source_observed_at = db.Column(db.DateTime)
-    is_reference = db.Column(db.Boolean, nullable=False, default=False, server_default="0")
+    legacy_source_url = db.Column('source_url', db.String(500))
+    legacy_source_observed_at = db.Column('source_observed_at', db.DateTime)
+    legacy_is_reference = db.Column('is_reference', db.Boolean, nullable=False, default=False, server_default="0")
+    publication_id = db.Column(db.Integer)
+    dish_name_override = db.Column(db.String(150))
+    description_override = db.Column(db.Text)
+    price_override = db.Column(db.Numeric(10, 2))
+    dietary_label_override = db.Column(db.String(80))
+    menu_edited_at = db.Column(db.DateTime)
+    menu_entry = db.relationship(MenuEntry, lazy='joined')
+    dish_name = menu_value('dish_name', 'item_name')
+    description = menu_value('description', 'description')
+    price = menu_value('price', 'reference_price')
+    dietary_label = menu_value('dietary_label', 'dietary_label')
+    source_name = publication_value('source_name', 'source_name')
+    source_url = publication_value('source_url', 'source_url')
+    source_observed_at = publication_value('source_observed_at', 'observed_at')
+    is_reference = publication_value('is_reference', 'is_reference')
     __table_args__ = (
         db.CheckConstraint("price >= 0", name="ck_dish_price"),
         db.UniqueConstraint("place_id", "source_name", "source_item_id", name="uq_dish_source"),
+        db.ForeignKeyConstraint(['publication_id', 'source_item_id'], ['menu_entry.publication_id', 'menu_entry.source_item_id'], name='fk_dish_menu_entry'),
+        db.UniqueConstraint('place_id', 'publication_id', 'source_item_id', name='uq_dish_offering'),
+        db.CheckConstraint('price_override IS NULL OR price_override >= 0', name='ck_dish_override_price'),
+        db.CheckConstraint('publication_id IS NULL OR source_item_id IS NOT NULL', name='ck_dish_entry_identity'),
+        db.CheckConstraint("publication_id IS NULL OR (dish_name = '' AND price = 0 AND description = '' AND dietary_label = '' AND source_name IS NULL AND source_url IS NULL AND source_observed_at IS NULL)", name='ck_dish_shared_payload'),
     )
 
 

@@ -87,6 +87,12 @@ def test_additive_migration_from_original_schema_preserves_rows(app):
         # Reconstruct the previous shape only in this isolated test database.
         db.session.execute(text('ALTER TABLE food_place DROP COLUMN enrichment'))
         if dialect == 'mysql':
+            # Remove the newer shared-menu dependencies before reconstructing
+            # the original columns in this disposable database.
+            db.session.execute(text('ALTER TABLE dish DROP FOREIGN KEY fk_dish_menu_entry'))
+            db.session.execute(text('ALTER TABLE dish DROP INDEX uq_dish_offering'))
+            db.session.execute(text('ALTER TABLE dish DROP CONSTRAINT ck_dish_shared_payload'))
+            db.session.execute(text('ALTER TABLE dish DROP CONSTRAINT ck_dish_entry_identity'))
             db.session.execute(text('ALTER TABLE food_place DROP INDEX uq_food_place_source'))
             for name in ['source_name','source_id','source_url','source_fetched_at','opening_hours','is_sample']:
                 db.session.execute(text(f'ALTER TABLE food_place DROP COLUMN {name}'))

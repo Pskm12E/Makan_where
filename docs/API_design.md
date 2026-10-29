@@ -1,5 +1,11 @@
 # Makan Where API
 
+## Reviewable unpriced menu items — 27 October 2026
+
+`establishment.menu` contains real outlet `dish` IDs, including imported published names whose `price` is JSON `null`. Such a price is unknown, not zero. `menuHighlights` remains an attributed display snapshot; the offline `import-menu-highlights --apply` operation creates the SQL references needed for reviews. `POST /api/content` continues to accept `dishes: [{id, feedback}]` and validates availability and ownership by venue in SQL before storing the embedded feedback in MongoDB. No free-text dish name bypass is introduced.
+
+The source importer accepts explicit `price: null` only for `isReference: true` items. A missing price field and invalid numeric values remain errors. Price-based insights exclude unknown prices. On an existing unpriced reference dish, an administrator may keep a blank price while editing its name/description; explicit numeric zero remains a valid, distinct outlet override.
+
 ## Listing photos and business details
 
 Catalogue/detail responses include `photo` (`url`, `kind`, `alt`, `credit`, `sourceUrl`), `customImage`, `website`, `menuUrl`, `phone`, `detailSources`, `detailsObservedAt`, `menuLinkKind`, `menuHighlights` and `menuHighlightsSource`. `image` is the effective display image, including an explicitly illustrative fallback; `customImage` is the stored override. These are not claims of actual outlet-photo coverage or confirmed prices. Unknown prices remain null.
@@ -81,4 +87,6 @@ The earlier reference is retained. `PUT /api/favourites/:placeId` now uses a nat
 
 `GET /api/admin/database-evaluation` returns the recorded isolated evaluation. It requires the administrator role and performs no load/fault tests. Its `status` is `not_run`, `unavailable`, `stale` or `recorded`; `currentSource` compares the recorded backend/test hash with this installation. Completed records contain `summary`, engine/platform metadata, per-experiment invariants and observations, raw benchmark samples/plans and explicit `limits`. The same object is included as `evaluation` in the database-lab snapshot and JSON export. `passed` describes the recorded run and must be interpreted together with source currency, the actual engine and each experiment's stated scope.
 
-A failed content POST may return 503 after its Mongo insert has committed if response serialization subsequently fails. This is explicitly tested. POST has no request-key deduplication contract; read back recent content before retrying an ambiguous submission. Do not equate an HTTP error with a distributed rollback. Concurrent normal content edits use last-write-wins, while removal and report resolution have conditional Mongo predicates. See the appended [database design](system_architecture.md#database-design-and-evaluation-addendum--6-october-2026).
+A failed content POST may return 503 after its Mongo insert committed. As of 27 October, every content/review POST requires `Idempotency-Key`: 16–128 ASCII letters, digits, dashes or underscores. Retry the identical payload at the same endpoint with the same key. The key/hash live atomically in the content document and a unique author/key index permits one stored post. A replay returns 200 with `replayed: true`; the first insert returns 201. Reusing a key with a different payload returns 409. A new key means a new post. Authentication and CSRF still apply.
+
+`GET /api/content/:id` returns visible content and its `revision`, plus a strong ETag. PATCH and DELETE require `If-Match: "REVISION"`; missing preconditions return 428, stale revisions 409. MongoDB matches and updates the revision atomically, so two edits based on the same revision have one winner. Legacy documents without a revision are treated as revision 1; the first successful change stores revision 2. The website retains a submission key after a failed request and sends the displayed revision on changes.

@@ -20,6 +20,25 @@ def save_place(place, data):
     if len(cuisines) > 10 or any(len(c) > 100 for c in cuisines):
         abort(400, "Choose up to 10 cuisines with names up to 100 characters.")
     place.cuisines = [lookup(Cuisine, "cuisine_name", name) for name in dict.fromkeys(cuisines)]
+    if 'tags' in data:
+        try:
+            place.tags = data['tags']
+        except ValueError as error:
+            abort(400, str(error))
+    for field_name, bound in [('latitude', 90), ('longitude', 180)]:
+        if field_name in data:
+            try:
+                value = None if data[field_name] is None else Decimal(str(data[field_name]))
+                if value is not None and (not value.is_finite() or not -bound <= value <= bound):
+                    raise ValueError()
+            except (InvalidOperation, ValueError):
+                abort(400, f'Invalid {field_name}.')
+            setattr(place, field_name, value)
+    if 'hygieneGrade' in data:
+        grade = data['hygieneGrade'] or None
+        if grade is not None and grade not in ('A', 'B', 'C', 'D'):
+            abort(400, 'Hygiene grade must be A, B, C, D or unknown.')
+        place.hygiene_grade = grade
     from .listing_details import save_details
     save_details(place, data)
 
@@ -38,12 +57,16 @@ def profile_fields(data):
 
 
 def save_dish(dish, data):
-    try:
-        price = Decimal(str(data.get("price")))
-        if not price.is_finite() or not 0 <= price <= 99999999 or price.as_tuple().exponent < -2:
-            raise ValueError()
-    except (InvalidOperation, ValueError):
-        abort(400, "Enter a price with at most two decimal places.")
+    # Blank keeps the source's unknown price on an existing unpriced reference.
+    if dish.menu_entry and dish.menu_entry.reference_price is None and data.get('price') in (None, ''):
+        price = None
+    else:
+        try:
+            price = Decimal(str(data.get("price")))
+            if not price.is_finite() or not 0 <= price <= 99999999 or price.as_tuple().exponent < -2:
+                raise ValueError()
+        except (InvalidOperation, ValueError):
+            abort(400, "Enter a price with at most two decimal places.")
     availability = data.get("availability", True if dish.is_available is None else dish.is_available)
     if not isinstance(availability, bool):
         abort(400, "Availability must be true or false.")
@@ -204,6 +227,28 @@ def register_routes(app, limiter):
     def schema():
         from .schema import application_schema
         return jsonify(application_schema())
+
+    @app.get("/api/admin/schema-records")
+    @authenticated(admin=True)
+    @limiter.limit("20 per minute")
+    def schema_records():
+        from .schema_records import record_snapshot
+        return jsonify(record_snapshot(request.args.get('store', 'sql'), request.args.get('table', 'dish'), request.args.get('key', '').strip()))
+
+    @app.post("/api/admin/schema/preview")
+    @authenticated(admin=True)
+    @limiter.limit("10 per minute")
+    def schema_preview():
+        from .schema_editor import preview
+        return jsonify(preview(payload().get('change')))
+
+    @app.post("/api/admin/schema/apply")
+    @authenticated(admin=True)
+    @limiter.limit("10 per minute")
+    def schema_apply():
+        from .schema_editor import apply
+        data = payload()
+        return jsonify(apply(data.get('change'), data.get('previewToken')))
 
     @app.route("/api/admin/establishments/<int:place_id>", methods=["PATCH", "DELETE"])
     @authenticated(admin=True)

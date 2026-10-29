@@ -1,6 +1,8 @@
 # Makan Where relational design reference
 
-The current code declares **17 SQL tables and 93 columns**: ten active tables and seven retained community migration tables. Live reviews, threads, comments, votes and reports are stored in MongoDB. This reference describes code declarations; it does not claim a live MariaDB deployment was inspected.
+**27 October dish-selection correction:** shared `menu_entry.reference_price` permits `NULL` when the published source supplies an item name but no price. The same outlet `dish_id` can then be selected in review feedback. `NULL` remains distinct from a known zero-price override; affordability queries exclude unknown prices. The offline, repeatable `import-menu-highlights` command populates retained, attributed names and preserves existing outlet identities, manual edits and unavailable rows. Earlier proposal text below remains historical.
+
+The current code declares **21 SQL tables and 115 columns**: fourteen active tables and seven retained community migration tables. The dish table preserves outlet identities and stores overrides; menu_publication/menu_entry hold shared facts. Live community content is in MongoDB. This describes source declarations, not a live deployment inspection.
 
 Regenerate with `.venv/Scripts/python scripts/export_database_model.py`. Canonical sources: `backend/models.py`, `backend/mongo.py`, `backend/community.py`, `backend/community_migration.py`, `backend/population.py` and `backend/database_lab.py`.
 
@@ -24,10 +26,22 @@ erDiagram
         INTEGER cuisine_id PK
         VARCHAR_100 cuisine_name UK
     }
+    menu_publication {
+        INTEGER publication_id PK
+        VARCHAR_80 source_name
+        VARCHAR_500 source_url
+        DATETIME observed_at
+        VARCHAR_64 payload_sha256 UK
+        BOOLEAN is_reference
+    }
     population_run {
         VARCHAR_100 run_key PK
         DATETIME created_at
         JSON details
+    }
+    tag {
+        INTEGER tag_id PK
+        VARCHAR_80 tag_name UK
     }
     user {
         INTEGER user_id PK
@@ -61,6 +75,14 @@ erDiagram
         VARCHAR_1000 opening_hours
         BOOLEAN is_sample
     }
+    menu_entry {
+        INTEGER publication_id PK, FK
+        VARCHAR_100 source_item_id PK
+        VARCHAR_150 item_name
+        TEXT description
+        NUMERIC_10_2 reference_price
+        VARCHAR_80 dietary_label
+    }
     discovery_event {
         INTEGER event_id PK
         INTEGER user_id FK
@@ -77,10 +99,16 @@ erDiagram
         BOOLEAN is_available
         VARCHAR_80 dietary_label
         VARCHAR_80 source_name
-        VARCHAR_100 source_item_id
+        VARCHAR_100 source_item_id FK
         VARCHAR_500 source_url
         DATETIME source_observed_at
         BOOLEAN is_reference
+        INTEGER publication_id FK
+        VARCHAR_150 dish_name_override
+        TEXT description_override
+        NUMERIC_10_2 price_override
+        VARCHAR_80 dietary_label_override
+        DATETIME menu_edited_at
     }
     favourite {
         INTEGER user_id PK, FK
@@ -91,15 +119,23 @@ erDiagram
         INTEGER place_id PK, FK
         INTEGER cuisine_id PK, FK
     }
+    place_tag {
+        INTEGER place_id PK, FK
+        INTEGER tag_id PK, FK
+    }
     area ||--o{ food_place : "area_id"
     category ||--o{ food_place : "category_id"
+    menu_publication ||--o{ menu_entry : "publication_id"
     food_place |o--o{ discovery_event : "place_id"
     user |o--o{ discovery_event : "user_id"
     food_place ||--o{ dish : "place_id"
+    menu_entry |o--o{ dish : "publication_id, source_item_id"
     food_place ||--o{ favourite : "place_id"
     user ||--o{ favourite : "user_id"
     cuisine ||--o{ place_cuisine : "cuisine_id"
     food_place ||--o{ place_cuisine : "place_id"
+    food_place ||--o{ place_tag : "place_id"
+    tag ||--o{ place_tag : "tag_id"
 ```
 
 ## Retained migration model
@@ -120,10 +156,22 @@ erDiagram
         INTEGER cuisine_id PK
         VARCHAR_100 cuisine_name UK
     }
+    menu_publication {
+        INTEGER publication_id PK
+        VARCHAR_80 source_name
+        VARCHAR_500 source_url
+        DATETIME observed_at
+        VARCHAR_64 payload_sha256 UK
+        BOOLEAN is_reference
+    }
     population_run {
         VARCHAR_100 run_key PK
         DATETIME created_at
         JSON details
+    }
+    tag {
+        INTEGER tag_id PK
+        VARCHAR_80 tag_name UK
     }
     user {
         INTEGER user_id PK
@@ -156,6 +204,14 @@ erDiagram
         DATETIME source_fetched_at
         VARCHAR_1000 opening_hours
         BOOLEAN is_sample
+    }
+    menu_entry {
+        INTEGER publication_id PK, FK
+        VARCHAR_100 source_item_id PK
+        VARCHAR_150 item_name
+        TEXT description
+        NUMERIC_10_2 reference_price
+        VARCHAR_80 dietary_label
     }
     content {
         INTEGER content_id PK
@@ -184,10 +240,16 @@ erDiagram
         BOOLEAN is_available
         VARCHAR_80 dietary_label
         VARCHAR_80 source_name
-        VARCHAR_100 source_item_id
+        VARCHAR_100 source_item_id FK
         VARCHAR_500 source_url
         DATETIME source_observed_at
         BOOLEAN is_reference
+        INTEGER publication_id FK
+        VARCHAR_150 dish_name_override
+        TEXT description_override
+        NUMERIC_10_2 price_override
+        VARCHAR_80 dietary_label_override
+        DATETIME menu_edited_at
     }
     favourite {
         INTEGER user_id PK, FK
@@ -197,6 +259,10 @@ erDiagram
     place_cuisine {
         INTEGER place_id PK, FK
         INTEGER cuisine_id PK, FK
+    }
+    place_tag {
+        INTEGER place_id PK, FK
+        INTEGER tag_id PK, FK
     }
     content_dish {
         INTEGER content_id PK, FK
@@ -237,16 +303,20 @@ erDiagram
     }
     area ||--o{ food_place : "area_id"
     category ||--o{ food_place : "category_id"
+    menu_publication ||--o{ menu_entry : "publication_id"
     food_place ||--o{ content : "place_id"
     user ||--o{ content : "author_id"
     user |o--o{ content : "removed_by_id"
     food_place |o--o{ discovery_event : "place_id"
     user |o--o{ discovery_event : "user_id"
     food_place ||--o{ dish : "place_id"
+    menu_entry |o--o{ dish : "publication_id, source_item_id"
     food_place ||--o{ favourite : "place_id"
     user ||--o{ favourite : "user_id"
     cuisine ||--o{ place_cuisine : "cuisine_id"
     food_place ||--o{ place_cuisine : "place_id"
+    food_place ||--o{ place_tag : "place_id"
+    tag ||--o{ place_tag : "tag_id"
     content ||--o{ content_dish : "content_id"
     dish ||--o{ content_dish : "dish_id"
     content ||--o{ report : "content_id"
@@ -295,6 +365,21 @@ Role: live.
 
 - UNIQUE `(cuisine_name)`.
 
+### menu_publication
+
+Role: live.
+
+| Column | Declared type | Nullable | Key |
+| --- | --- | --- | --- |
+| `publication_id` | `INTEGER` | No | PK |
+| `source_name` | `VARCHAR(80)` | No | — |
+| `source_url` | `VARCHAR(500)` | No | — |
+| `observed_at` | `DATETIME` | No | — |
+| `payload_sha256` | `VARCHAR(64)` | No | UQ |
+| `is_reference` | `BOOLEAN` | No | — |
+
+- UNIQUE `(payload_sha256)`.
+
 ### population_run
 
 Role: live.
@@ -305,6 +390,17 @@ Role: live.
 | `created_at` | `DATETIME` | No | — |
 | `details` | `JSON` | No | — |
 
+
+### tag
+
+Role: live.
+
+| Column | Declared type | Nullable | Key |
+| --- | --- | --- | --- |
+| `tag_id` | `INTEGER` | No | PK |
+| `tag_name` | `VARCHAR(80)` | No | UQ |
+
+- UNIQUE `(tag_name)`.
 
 ### user
 
@@ -356,8 +452,27 @@ Role: live.
 - FK `(category_id)` → `category(category_id)`.
 - UNIQUE `(google_place_id)`.
 - UNIQUE `(source_name, source_id)`.
+- CHECK `hygiene_grade IS NULL OR hygiene_grade IN ('A','B','C','D')`.
+- CHECK `latitude IS NULL OR latitude BETWEEN -90 AND 90`.
+- CHECK `longitude IS NULL OR longitude BETWEEN -180 AND 180`.
 - Index `ix_food_place_area_id` on `(area_id)`.
 - Index `ix_food_place_place_name` on `(place_name)`.
+
+### menu_entry
+
+Role: live.
+
+| Column | Declared type | Nullable | Key |
+| --- | --- | --- | --- |
+| `publication_id` | `INTEGER` | No | PK, FK |
+| `source_item_id` | `VARCHAR(100)` | No | PK |
+| `item_name` | `VARCHAR(150)` | No | — |
+| `description` | `TEXT` | No | — |
+| `reference_price` | `NUMERIC(10, 2)` | Yes | — |
+| `dietary_label` | `VARCHAR(80)` | No | — |
+
+- FK `(publication_id)` → `menu_publication(publication_id)`.
+- CHECK `reference_price >= 0`.
 
 ### content
 
@@ -416,14 +531,25 @@ Role: live.
 | `is_available` | `BOOLEAN` | No | — |
 | `dietary_label` | `VARCHAR(80)` | No | — |
 | `source_name` | `VARCHAR(80)` | Yes | — |
-| `source_item_id` | `VARCHAR(100)` | Yes | — |
+| `source_item_id` | `VARCHAR(100)` | Yes | FK |
 | `source_url` | `VARCHAR(500)` | Yes | — |
 | `source_observed_at` | `DATETIME` | Yes | — |
 | `is_reference` | `BOOLEAN` | No | — |
+| `publication_id` | `INTEGER` | Yes | FK |
+| `dish_name_override` | `VARCHAR(150)` | Yes | — |
+| `description_override` | `TEXT` | Yes | — |
+| `price_override` | `NUMERIC(10, 2)` | Yes | — |
+| `dietary_label_override` | `VARCHAR(80)` | Yes | — |
+| `menu_edited_at` | `DATETIME` | Yes | — |
 
 - FK `(place_id)` → `food_place(place_id)`.
+- FK `(publication_id, source_item_id)` → `menu_entry(publication_id, source_item_id)`.
+- UNIQUE `(place_id, publication_id, source_item_id)`.
 - UNIQUE `(place_id, source_name, source_item_id)`.
 - CHECK `price >= 0`.
+- CHECK `price_override IS NULL OR price_override >= 0`.
+- CHECK `publication_id IS NULL OR (dish_name = '' AND price = 0 AND description = '' AND dietary_label = '' AND source_name IS NULL AND source_url IS NULL AND source_observed_at IS NULL)`.
+- CHECK `publication_id IS NULL OR source_item_id IS NOT NULL`.
 - Index `ix_dish_place_id` on `(place_id)`.
 
 ### favourite
@@ -450,6 +576,18 @@ Role: live.
 
 - FK `(cuisine_id)` → `cuisine(cuisine_id)`.
 - FK `(place_id)` → `food_place(place_id)`.
+
+### place_tag
+
+Role: live.
+
+| Column | Declared type | Nullable | Key |
+| --- | --- | --- | --- |
+| `place_id` | `INTEGER` | No | PK, FK |
+| `tag_id` | `INTEGER` | No | PK, FK |
+
+- FK `(place_id)` → `food_place(place_id)`.
+- FK `(tag_id)` → `tag(tag_id)`.
 
 ### content_dish
 
@@ -549,7 +687,7 @@ Role: legacy migration source.
 ```sql
 SELECT p.place_id, p.place_name, COUNT(d.dish_id) AS available_dishes,
 MIN(d.price) AS starting_price, AVG(d.price) AS average_price
-FROM food_place p LEFT JOIN dish d ON d.place_id = p.place_id AND d.is_available = 1
+FROM food_place p LEFT JOIN catalogue_effective_menu d ON d.place_id = p.place_id AND d.is_available = 1
 WHERE p.archived_at IS NULL GROUP BY p.place_id, p.place_name
 ```
 

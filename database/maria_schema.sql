@@ -1,6 +1,6 @@
--- Makan Where: 10 live SQL tables and 7 retained legacy community migration tables.
+-- Makan Where: 14 live SQL tables and 7 retained legacy community migration tables.
 
--- Existing installations: run migrate-catalogue, migrate-menus and migrate-details before init-db.
+-- Existing installations: back up, stop writes and run migrate-design before init-db.
 
 -- Canonical source: backend/models.py; live community documents are in MongoDB.
 
@@ -27,11 +27,29 @@ CREATE TABLE IF NOT EXISTS cuisine (
 	CONSTRAINT uq_cuisine_cuisine_name UNIQUE (cuisine_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS menu_publication (
+	publication_id INTEGER NOT NULL AUTO_INCREMENT,
+	source_name VARCHAR(80) NOT NULL,
+	source_url VARCHAR(500) NOT NULL,
+	observed_at DATETIME NOT NULL,
+	payload_sha256 VARCHAR(64) NOT NULL,
+	is_reference BOOL NOT NULL,
+	CONSTRAINT pk_menu_publication PRIMARY KEY (publication_id),
+	CONSTRAINT uq_menu_publication_payload_sha256 UNIQUE (payload_sha256)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS population_run (
 	run_key VARCHAR(100) NOT NULL,
 	created_at DATETIME NOT NULL,
 	details JSON NOT NULL,
 	CONSTRAINT pk_population_run PRIMARY KEY (run_key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS tag (
+	tag_id INTEGER NOT NULL AUTO_INCREMENT,
+	tag_name VARCHAR(80) NOT NULL,
+	CONSTRAINT pk_tag PRIMARY KEY (tag_id),
+	CONSTRAINT uq_tag_tag_name UNIQUE (tag_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS user (
@@ -72,6 +90,9 @@ CREATE TABLE IF NOT EXISTS food_place (
 	is_sample BOOL NOT NULL DEFAULT '0',
 	CONSTRAINT pk_food_place PRIMARY KEY (place_id),
 	CONSTRAINT uq_food_place_source UNIQUE (source_name, source_id),
+	CONSTRAINT ck_place_latitude CHECK (latitude IS NULL OR latitude BETWEEN -90 AND 90),
+	CONSTRAINT ck_place_longitude CHECK (longitude IS NULL OR longitude BETWEEN -180 AND 180),
+	CONSTRAINT ck_place_hygiene CHECK (hygiene_grade IS NULL OR hygiene_grade IN ('A','B','C','D')),
 	CONSTRAINT fk_food_place_area_id_area FOREIGN KEY(area_id) REFERENCES area (area_id),
 	CONSTRAINT fk_food_place_category_id_category FOREIGN KEY(category_id) REFERENCES category (category_id),
 	CONSTRAINT uq_food_place_google_place_id UNIQUE (google_place_id)
@@ -80,6 +101,18 @@ CREATE TABLE IF NOT EXISTS food_place (
 CREATE INDEX IF NOT EXISTS ix_food_place_area_id ON food_place (area_id);
 
 CREATE INDEX IF NOT EXISTS ix_food_place_place_name ON food_place (place_name);
+
+CREATE TABLE IF NOT EXISTS menu_entry (
+	publication_id INTEGER NOT NULL,
+	source_item_id VARCHAR(100) NOT NULL,
+	item_name VARCHAR(150) NOT NULL,
+	description TEXT NOT NULL,
+	reference_price NUMERIC(10, 2),
+	dietary_label VARCHAR(80) NOT NULL,
+	CONSTRAINT pk_menu_entry PRIMARY KEY (publication_id, source_item_id),
+	CONSTRAINT ck_entry_price CHECK (reference_price >= 0),
+	CONSTRAINT fk_menu_entry_publication_id_menu_publication FOREIGN KEY(publication_id) REFERENCES menu_publication (publication_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS content (
 	content_id INTEGER NOT NULL AUTO_INCREMENT,
@@ -132,9 +165,20 @@ CREATE TABLE IF NOT EXISTS dish (
 	source_url VARCHAR(500),
 	source_observed_at DATETIME,
 	is_reference BOOL NOT NULL DEFAULT '0',
+	publication_id INTEGER,
+	dish_name_override VARCHAR(150),
+	description_override TEXT,
+	price_override NUMERIC(10, 2),
+	dietary_label_override VARCHAR(80),
+	menu_edited_at DATETIME,
 	CONSTRAINT pk_dish PRIMARY KEY (dish_id),
 	CONSTRAINT ck_dish_price CHECK (price >= 0),
 	CONSTRAINT uq_dish_source UNIQUE (place_id, source_name, source_item_id),
+	CONSTRAINT fk_dish_menu_entry FOREIGN KEY(publication_id, source_item_id) REFERENCES menu_entry (publication_id, source_item_id),
+	CONSTRAINT uq_dish_offering UNIQUE (place_id, publication_id, source_item_id),
+	CONSTRAINT ck_dish_override_price CHECK (price_override IS NULL OR price_override >= 0),
+	CONSTRAINT ck_dish_entry_identity CHECK (publication_id IS NULL OR source_item_id IS NOT NULL),
+	CONSTRAINT ck_dish_shared_payload CHECK (publication_id IS NULL OR (dish_name = '' AND price = 0 AND description = '' AND dietary_label = '' AND source_name IS NULL AND source_url IS NULL AND source_observed_at IS NULL)),
 	CONSTRAINT fk_dish_place_id_food_place FOREIGN KEY(place_id) REFERENCES food_place (place_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -155,6 +199,14 @@ CREATE TABLE IF NOT EXISTS place_cuisine (
 	CONSTRAINT pk_place_cuisine PRIMARY KEY (place_id, cuisine_id),
 	CONSTRAINT fk_place_cuisine_place_id_food_place FOREIGN KEY(place_id) REFERENCES food_place (place_id),
 	CONSTRAINT fk_place_cuisine_cuisine_id_cuisine FOREIGN KEY(cuisine_id) REFERENCES cuisine (cuisine_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS place_tag (
+	place_id INTEGER NOT NULL,
+	tag_id INTEGER NOT NULL,
+	CONSTRAINT pk_place_tag PRIMARY KEY (place_id, tag_id),
+	CONSTRAINT fk_place_tag_place_id_food_place FOREIGN KEY(place_id) REFERENCES food_place (place_id),
+	CONSTRAINT fk_place_tag_tag_id_tag FOREIGN KEY(tag_id) REFERENCES tag (tag_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS content_dish (

@@ -101,6 +101,71 @@
       "indexes": []
     },
     {
+      "name": "menu_publication",
+      "role": "live",
+      "columns": [
+        {
+          "name": "publication_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "source_name",
+          "type": "VARCHAR(80)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "source_url",
+          "type": "VARCHAR(500)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "observed_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "payload_sha256",
+          "type": "VARCHAR(64)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": true
+        },
+        {
+          "name": "is_reference",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "publication_id"
+      ],
+      "unique": [
+        [
+          "payload_sha256"
+        ]
+      ],
+      "foreign_keys": [],
+      "checks": [],
+      "indexes": []
+    },
+    {
       "name": "population_run",
       "role": "live",
       "columns": [
@@ -133,6 +198,39 @@
         "run_key"
       ],
       "unique": [],
+      "foreign_keys": [],
+      "checks": [],
+      "indexes": []
+    },
+    {
+      "name": "tag",
+      "role": "live",
+      "columns": [
+        {
+          "name": "tag_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "tag_name",
+          "type": "VARCHAR(80)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": true
+        }
+      ],
+      "primary_key": [
+        "tag_id"
+      ],
+      "unique": [
+        [
+          "tag_name"
+        ]
+      ],
       "foreign_keys": [],
       "checks": [],
       "indexes": []
@@ -422,7 +520,11 @@
           "nullable": false
         }
       ],
-      "checks": [],
+      "checks": [
+        "hygiene_grade IS NULL OR hygiene_grade IN ('A','B','C','D')",
+        "latitude IS NULL OR latitude BETWEEN -90 AND 90",
+        "longitude IS NULL OR longitude BETWEEN -180 AND 180"
+      ],
       "indexes": [
         {
           "name": "ix_food_place_area_id",
@@ -439,6 +541,81 @@
           "unique": false
         }
       ]
+    },
+    {
+      "name": "menu_entry",
+      "role": "live",
+      "columns": [
+        {
+          "name": "publication_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "source_item_id",
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "pk": true,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "item_name",
+          "type": "VARCHAR(150)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "reference_price",
+          "type": "NUMERIC(10, 2)",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "dietary_label",
+          "type": "VARCHAR(80)",
+          "nullable": false,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "publication_id",
+        "source_item_id"
+      ],
+      "unique": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "publication_id"
+          ],
+          "parent": "menu_publication",
+          "targets": [
+            "publication_id"
+          ],
+          "nullable": false
+        }
+      ],
+      "checks": [
+        "reference_price >= 0"
+      ],
+      "indexes": []
     },
     {
       "name": "content",
@@ -737,7 +914,7 @@
           "type": "VARCHAR(100)",
           "nullable": true,
           "pk": false,
-          "fk": false,
+          "fk": true,
           "unique": false
         },
         {
@@ -763,12 +940,65 @@
           "pk": false,
           "fk": false,
           "unique": false
+        },
+        {
+          "name": "publication_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "pk": false,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "dish_name_override",
+          "type": "VARCHAR(150)",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "description_override",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "price_override",
+          "type": "NUMERIC(10, 2)",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "dietary_label_override",
+          "type": "VARCHAR(80)",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
+        },
+        {
+          "name": "menu_edited_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "pk": false,
+          "fk": false,
+          "unique": false
         }
       ],
       "primary_key": [
         "dish_id"
       ],
       "unique": [
+        [
+          "place_id",
+          "publication_id",
+          "source_item_id"
+        ],
         [
           "place_id",
           "source_name",
@@ -785,10 +1015,25 @@
             "place_id"
           ],
           "nullable": false
+        },
+        {
+          "columns": [
+            "publication_id",
+            "source_item_id"
+          ],
+          "parent": "menu_entry",
+          "targets": [
+            "publication_id",
+            "source_item_id"
+          ],
+          "nullable": true
         }
       ],
       "checks": [
-        "price >= 0"
+        "price >= 0",
+        "price_override IS NULL OR price_override >= 0",
+        "publication_id IS NULL OR (dish_name = '' AND price = 0 AND description = '' AND dietary_label = '' AND source_name IS NULL AND source_url IS NULL AND source_observed_at IS NULL)",
+        "publication_id IS NULL OR source_item_id IS NOT NULL"
       ],
       "indexes": [
         {
@@ -903,6 +1148,57 @@
           "parent": "food_place",
           "targets": [
             "place_id"
+          ],
+          "nullable": false
+        }
+      ],
+      "checks": [],
+      "indexes": []
+    },
+    {
+      "name": "place_tag",
+      "role": "live",
+      "columns": [
+        {
+          "name": "place_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": true,
+          "unique": false
+        },
+        {
+          "name": "tag_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "pk": true,
+          "fk": true,
+          "unique": false
+        }
+      ],
+      "primary_key": [
+        "place_id",
+        "tag_id"
+      ],
+      "unique": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "place_id"
+          ],
+          "parent": "food_place",
+          "targets": [
+            "place_id"
+          ],
+          "nullable": false
+        },
+        {
+          "columns": [
+            "tag_id"
+          ],
+          "parent": "tag",
+          "targets": [
+            "tag_id"
           ],
           "nullable": false
         }
@@ -1340,7 +1636,7 @@
   ],
   "view": {
     "name": "catalogue_menu_summary",
-    "query": "SELECT p.place_id, p.place_name, COUNT(d.dish_id) AS available_dishes,\nMIN(d.price) AS starting_price, AVG(d.price) AS average_price\nFROM food_place p LEFT JOIN dish d ON d.place_id = p.place_id AND d.is_available = 1\nWHERE p.archived_at IS NULL GROUP BY p.place_id, p.place_name"
+    "query": "SELECT p.place_id, p.place_name, COUNT(d.dish_id) AS available_dishes,\nMIN(d.price) AS starting_price, AVG(d.price) AS average_price\nFROM food_place p LEFT JOIN catalogue_effective_menu d ON d.place_id = p.place_id AND d.is_available = 1\nWHERE p.archived_at IS NULL GROUP BY p.place_id, p.place_name"
   },
   "mongo_validators": {
     "content": {
@@ -1430,6 +1726,23 @@
               },
               "is_demo": {
                 "bsonType": "bool"
+              },
+              "is_example": {
+                "bsonType": "bool"
+              },
+              "revision": {
+                "bsonType": "int",
+                "minimum": 1
+              },
+              "request_key": {
+                "bsonType": "string",
+                "minLength": 16,
+                "maxLength": 128
+              },
+              "request_hash": {
+                "bsonType": "string",
+                "minLength": 64,
+                "maxLength": 64
               },
               "dishes": {
                 "bsonType": "array",
@@ -1621,8 +1934,68 @@
           },
           "created_at": {
             "bsonType": "date"
+          },
+          "resolved_by_id": {
+            "bsonType": [
+              "int",
+              "long"
+            ],
+            "minimum": 1
+          },
+          "resolved_at": {
+            "bsonType": "date"
+          },
+          "resolution_note": {
+            "bsonType": "string",
+            "minLength": 1,
+            "maxLength": 1000
           }
-        }
+        },
+        "oneOf": [
+          {
+            "properties": {
+              "status": {
+                "enum": [
+                  "open"
+                ]
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "resolved_by_id"
+                  ]
+                },
+                {
+                  "required": [
+                    "resolved_at"
+                  ]
+                },
+                {
+                  "required": [
+                    "resolution_note"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "properties": {
+              "status": {
+                "enum": [
+                  "resolved",
+                  "dismissed"
+                ]
+              }
+            },
+            "required": [
+              "resolved_by_id",
+              "resolved_at",
+              "resolution_note"
+            ]
+          }
+        ]
       }
     }
   },

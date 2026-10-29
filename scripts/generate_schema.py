@@ -6,8 +6,8 @@ from sqlalchemy.dialects.mysql import dialect
 from sqlalchemy.schema import CreateTable, CreateIndex
 from backend.models import db
 
-chunks = ['-- Makan Where: 10 live SQL tables and 7 retained legacy community migration tables.',
-          '-- Existing installations: run migrate-catalogue, migrate-menus and migrate-details before init-db.',
+chunks = ['-- Makan Where: 14 live SQL tables and 7 retained legacy community migration tables.',
+          '-- Existing installations: back up, stop writes and run migrate-design before init-db.',
           '-- Canonical source: backend/models.py; live community documents are in MongoDB.',
           '-- This is additive DDL. Use init-db for the derived catalogue view too.']
 for table in db.metadata.sorted_tables:

@@ -59,7 +59,7 @@ def main():
     from backend.app import create_app
     app = create_app()
     runner = app.test_cli_runner()
-    for command in ('migrate-menus', 'migrate-details', 'init-db', 'init-mongo',
+    for command in ('migrate-menus', 'migrate-details', 'migrate-design', 'init-db', 'init-mongo',
                     'migrate-community', 'seed-coursework', 'enrich-listings --apply'):
         result = runner.invoke(args=command.split())
         if result.exit_code:
@@ -68,6 +68,8 @@ def main():
     with app.app_context():
         ensure_accounts()
         import_reference_menus(app)
+        from backend.reference_menus import import_menu_highlights
+        print(json.dumps(import_menu_highlights(apply=True)), flush=True)
     print('Laptop setup complete. Read the LECTURER_* entries in .env.laptop to sign in.', flush=True)
 
 

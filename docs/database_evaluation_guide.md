@@ -1,6 +1,6 @@
 # Database evaluation aligned with the lecturer's feedback
 
-Added 16 October 2026. The earlier design and verification write-ups are retained. The priorities are correctness and evidence for the implemented database design. The separate normalised-menu prototype is a proposal and is not presented as the deployed schema.
+Added 16 October, updated 27 October 2026. The priority is correctness and reproducible evidence. Current source implements shared menu facts, outlet overrides and relational tags; the original standalone prototype remains a historical teaching model. See the current architecture addendum for the physical `dish` compatibility mapping. Deployment and Docker runtime claims must follow their dated verification records.
 
 ## What to demonstrate
 
@@ -22,9 +22,9 @@ The database experiment implementations are in [`tests/test_database_evaluation.
 
 **Cross-engine consistency.** There is no SQL foreign key into MongoDB and no distributed transaction. Parent validation prevents normal invalid writes; soft deletion retains identities; public reads recheck visibility; reconciliation detects out-of-band invalid references. These are explicit application rules with tests, not a claim of global serializability.
 
-**Recovery contract.** Idempotent population phases can resume after partial success. This does not imply that every API POST is idempotent: the existing experiment shows an HTTP 503 after a committed post can leave one stored document. Re-reading establishes what happened; blindly retrying may duplicate it. Ordinary concurrent edits remain last-write-wins. Do not describe those limitations as solved.
+**Recovery contract.** Population can resume after partial success. Content/review POSTs require an Idempotency-Key; an identical same-key retry reads the one persisted identity after an ambiguous acknowledgement. A different payload with that key fails. Edits/removals require If-Match and atomically reject stale revisions. These contracts have dedicated acceptance tests. A new key still represents a new request. The separate recovery probe establishes graceful restart and logical restoration only when its recorded observations pass.
 
-**Normalisation scope.** The appended [relational redesign](relational_design.md#revised-design-using-the-week-1-to-5-concepts) contains actual FDs, candidate keys, weak-entity identity and separate lossless/dependency-preservation reasoning for the proposed menu decomposition. Its 19 isolated checks establish the proposal's stated properties. Current application evidence must continue to describe `Dish` and the implemented schema until a migration is completed.
+**Normalisation scope.** The [relational redesign](relational_design.md#revised-design-using-the-week-1-to-5-concepts) supplies the original FD, candidate-key and lossless/dependency-preservation arguments for shared menu facts. Runtime tests now exercise actual imports, local overrides and old-schema upgrades. The physical dish table preserves offering IDs; compatibility/manual columns and JSON enrichment/receipts require explicitly scoped claims. Do not label the entire database BCNF merely because primary keys exist.
 
 ## Repeat the measurements on the target engines
 

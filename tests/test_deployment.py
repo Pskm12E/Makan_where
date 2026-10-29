@@ -5,6 +5,13 @@ import pytest
 from deploy import install_guest
 
 
+def test_deployed_app_grants_cover_the_canonical_schema_and_catalogue_views():
+    from backend.models import db
+    assert set(install_guest.BASE_TABLES) == set(db.metadata.tables)
+    assert len(install_guest.BASE_TABLES) == len(set(install_guest.BASE_TABLES))
+    assert set(install_guest.READ_ONLY_VIEWS) == {'catalogue_menu_summary', 'catalogue_effective_menu'}
+
+
 def archive_with(path, name, kind=tarfile.REGTYPE):
     with tarfile.open(path, 'w:gz') as archive:
         member = tarfile.TarInfo(name)
