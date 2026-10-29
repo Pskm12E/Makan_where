@@ -1,0 +1,83 @@
+{
+  "checkedAt": "2026-10-29T12:37:17.162639+00:00",
+  "url": "https://makanwhere.4bytedigi.com",
+  "release": "/srv/makanwhere/releases/4ecad8f729052950",
+  "releaseArchiveSha256": "4ecad8f729052950f3a73386ce4de779ed2e86c2197c28168b8a55358f97cd15",
+  "backup": "/var/backups/makanwhere/20261029T123453Z",
+  "installerExitCode": 0,
+  "linuxTests": {
+    "passed": 106,
+    "seconds": 246.17
+  },
+  "nativeWindowsTests": {
+    "passed": 106,
+    "seconds": 382.89
+  },
+  "health": {
+    "status": "ok",
+    "service": "Makan Where",
+    "database": "connected",
+    "mongoDB": "connected"
+  },
+  "pages": {
+    "/": 200,
+    "/restaurant.html?id=14": 200,
+    "/admin.html": 200,
+    "/database-lab.html": 200
+  },
+  "venue14": {
+    "menuCount": 45,
+    "allPricesUnknown": true,
+    "bigMacDishId": 7194
+  },
+  "priorVenueContentPreserved": {
+    "count": 9,
+    "ids": [
+      739,
+      740,
+      741,
+      742,
+      743,
+      744,
+      745,
+      746,
+      747
+    ],
+    "beforeSha256": "e5a4b5adfa9241ed30dec394f95d1d44dd19f65f81f0f0991fb3aa993900a77b",
+    "afterSha256": "e5a4b5adfa9241ed30dec394f95d1d44dd19f65f81f0f0991fb3aa993900a77b"
+  },
+  "revisionContractPresent": true,
+  "protectedEndpoints": {
+    "/api/admin/schema": 401,
+    "/api/admin/reports": 401,
+    "/api/admin/schema-records?store=sql&table=user": 401
+  },
+  "publicAssetsMatchSource": {
+    "js/api.js": "8175ff5ac750557b31b92fca4c23bd77873c397f61c0fa9d8a4545e26c7b024a",
+    "js/restaurant.js": "0c40be2ad69a3c843485a5b8621dd4ebc135a29efb679d31fabe59b1ea242fa4",
+    "js/inline-actions.js": "d033e9b3b4750611f46fb2516846c6de4575f6efcd9ff0d9786995bb96b51a53",
+    "js/admin.js": "4631c4290278e6236508fac2141edfca98f9ea6e65b7ddcc862dbace5bdf6582",
+    "css/inline-actions.css": "16a340e4d9c5c87374dc5f6555acf545ae43b3d3fae7307044f2b52df0696860",
+    "js/schema-editor.js": "5fb8c0d0b4e73cece34ae22a3c41a262a8d162f06861aa4610aeb6339c78053b"
+  },
+  "analyticsResponded": true,
+  "unknownPricesExcludedFromAffordableItems": true,
+  "scope": "Public HTTPS read-only acceptance after successful installer verification under the application identity. No live test accounts, reviews, reports or votes were created.",
+  "browser": {
+    "url": "https://makanwhere.4bytedigi.com/restaurant.html?id=14",
+    "selectableDishes": 45,
+    "selectedDish": "Big Mac",
+    "inlineRemovalTitle": "Remove this review?",
+    "inlineRemovalButtons": [
+      "Keep it",
+      "Remove review"
+    ],
+    "removalCancelled": true,
+    "existingAdministratorSessionStillSignedIn": true,
+    "consoleWarningsOrErrors": 0,
+    "screenshot": "live-release-2026-10-29.png",
+    "scope": "Selected an unsubmitted form option and opened/cancelled the inline removal controls. No persistent content was submitted or removed."
+  },
+  "releaseTag": "v2026.10.29",
+  "implementationCommit": "bb20510db92f471fcc361e4036f5dc2913605a8e"
+}

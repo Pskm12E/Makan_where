@@ -1,5 +1,11 @@
 # Existing-server update
 
+## Current release — 29 October 2026
+
+Published to https://makanwhere.4bytedigi.com/. The active release is `/srv/makanwhere/releases/4ecad8f729052950`; backup: `/var/backups/makanwhere/20261029T123453Z`. All **106 tests passed on the Linux VM in 246.17 seconds**, and the installer verified the database audit and constraints under the application identity before activation. Both databases and neighbouring origins remained healthy. Public HTTPS acceptance verified 45 selectable McDonald's menu items with unknown prices, preservation of its nine existing posts, current revision metadata, protected admin endpoints, analytics, and six asset hashes matching the release source. See the [release acceptance record](../docs/evidence/server-release-2026-10-29.json).
+
+This release includes shared menu facts/tags, retry and revision protection, the schema tools, inline edit/report/removal, and source-backed unpriced dish selection. Installer table/view grants and release fingerprint inputs are included. The Windows native suite also passed 106 tests; Linux deployment is verified, while Docker container execution retains its separately documented limitation. Earlier entries below are historical.
+
 ## Current release — combined database evidence, 4 October 2026
 
 The live release is `/srv/makanwhere/releases/020722529efc502a`. All **61 tests passed in 106.70 seconds** against MariaDB/MongoDB; backup: `/var/backups/makanwhere/20261004T084109Z`. The evidence page shares the main orange and cream theme, displays all six sections together and provides a single **Run all checks** action and combined export. Public-browser checks passed all nine constraint probes and three password checks. All six sections and 39 expanded details were visible in the document, with no desktop horizontal overflow or browser warnings/errors. The administrator display name is now `Administrator`; login credentials and role are unchanged. Generated/sample records remain labelled. Earlier release records below are historical.

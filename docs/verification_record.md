@@ -1,5 +1,11 @@
 # Verification record
 
+## Live publication — 29 October 2026
+
+- Published `/srv/makanwhere/releases/4ecad8f729052950` to [MakanWhereSG](https://makanwhere.4bytedigi.com/). Installer exit status was zero; backup: `/var/backups/makanwhere/20261029T123453Z`. The Linux MariaDB/MongoDB suite passed **106 tests in 246.17 seconds**, with passing current-source server evaluation. Backups, migrations, unpriced menu-name imports, application-identity integrity/constraint verification and service health gates completed before activation. The host also verified both neighbouring origins remained healthy.
+- [Read-only public HTTPS acceptance](evidence/server-release-2026-10-29.json) confirmed both databases connected; homepage, restaurant, admin shell and evidence page HTTP 200; unauthenticated administrator API requests HTTP 401; analytics functioning; and six live JS/CSS files matching the local release bytes. Venue #14 now exposes **45 reviewable dishes**, including Big Mac, with unknown prices remaining `null`. All nine previously visible venue posts retained their IDs and content digest; revision metadata is now present. No live test account, post, vote or report was created.
+- GitHub main received the complete source changes as `bb20510`. The final dated tag/release follows the publication record commit. Historical entries describing NetBird/sudo blockers and local-only availability are superseded by this completed deployment; their original observations remain intact.
+
 ## Release preparation — 29 October 2026
 
 - User requested publishing the completed changes to the existing website, pushing GitHub main, and creating a release tag. GitHub access and the existing origin were verified; main matched origin/main before this release.

@@ -1,5 +1,7 @@
 # Makan Where
 
+**Live release — 29 October 2026:** the database refinements, inline community actions, schema tools and published dish selection are deployed at [MakanWhereSG](https://makanwhere.4bytedigi.com/). All 106 tests passed on the deployment server. See the [release verification](docs/evidence/server-release-2026-10-29.json) and [deployment record](deploy/README.md).
+
 **27 October database revision:** shared menu facts now use `menu_publication` and `menu_entry`; the existing `dish` identity represents an outlet offering with explicit overrides. Tags use `tag`/`place_tag`. Content creation requires an `Idempotency-Key`, and edits/removal require an `If-Match` revision. See the current [architecture and recovery policy](docs/system_architecture.md#implemented-database-refinement--27-october-2026) and [Docker handover](docs/docker_laptop_guide.md). Earlier deployment/results below remain dated historical observations.
 
 **Dish selection correction:** retained chain menu names are now imported as real, reviewable outlet dishes. An unknown published price stays `NULL` and displays as **Price not listed**. Fresh laptop/Docker setup imports these automatically. For an existing installation, back up and stop writes, run `flask --app backend.app migrate-design`, preview `flask --app backend.app import-menu-highlights`, then apply with `--apply`. Existing dish IDs, prices, edits and removals are retained. This requires backend/schema/data deployment; copying frontend files alone does not populate the dropdown.
