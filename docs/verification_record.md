@@ -1,5 +1,11 @@
 # Verification record
 
+## Brand logo — 29 October 2026
+
+- Replaced the plate emoji with an original orange SVG mark combining a steaming bowl and location pin. All nine page headers use the mark beside the existing wordmark; the same SVG is the favicon. Brand links lead home, use an accessible name and visible keyboard focus, and reserve the image dimensions to avoid layout shift.
+- Inspected the desktop header, 390 × 844 phone layout and dark sign-in page. The phone document had no horizontal overflow; the mark displays at 40 × 40 px with a 44 px minimum home-link height. The mechanical design detector was run once; its findings concerned existing theme/page styles outside this logo change.
+- Published only the SVG, shared stylesheet and nine HTML files, with guarded file hashes and rollback copies at `/var/backups/makanwhere/logo-20261029T125345Z`. No service restart, application-code change or database write occurred. [Public acceptance](evidence/logo-update-2026-10-29.json) verifies all eleven files and SVG MIME type, both database health indicators and the retained 45-item menu. The existing passing 106-test application evaluation still matches the source. [Live browser preview](evidence/live-logo-2026-10-29.png) confirms the logo, its accessible home link and favicon URL.
+
 ## Live publication — 29 October 2026
 
 - Published `/srv/makanwhere/releases/4ecad8f729052950` to [MakanWhereSG](https://makanwhere.4bytedigi.com/). Installer exit status was zero; backup: `/var/backups/makanwhere/20261029T123453Z`. The Linux MariaDB/MongoDB suite passed **106 tests in 246.17 seconds**, with passing current-source server evaluation. Backups, migrations, unpriced menu-name imports, application-identity integrity/constraint verification and service health gates completed before activation. The host also verified both neighbouring origins remained healthy.

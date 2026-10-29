@@ -1,0 +1,54 @@
+{
+  "checkedAt": "2026-10-29T12:56:25.449019+00:00",
+  "url": "https://makanwhere.4bytedigi.com",
+  "root": "/srv/makanwhere/releases/4ecad8f729052950",
+  "backup": "/var/backups/makanwhere/logo-20261029T125345Z",
+  "scope": "Static SVG/CSS/HTML only; no service restart or database writes.",
+  "logo": "assets/brand/makanwhere-mark.svg",
+  "logoBytes": 646,
+  "brandedPages": 9,
+  "logoHomeLinks": true,
+  "faviconMimeType": "image/svg+xml",
+  "allPublicFilesMatch": {
+    "assets/brand/makanwhere-mark.svg": "57e6ef555ca21603eefc0b5a931f0aceecd1adebe9e399bb9f34157ce1f2d893",
+    "css/style.css": "e251b3183479f12406e277b53946c68457accc5bfeca38bb9a14c60d23196623",
+    "admin.html": "b449283aa928d4242b863fb5ed50a459ca99d52269881165e45074837799edb8",
+    "analytics.html": "e5e9ed3d6c91a79481ae2fe3c2bcfaba437c71c8065d22f4762a0b4ea048ffe5",
+    "auth.html": "191c09f30255565b3219be61240387e6fe56e17d32b15596b7433a7c61ff0645",
+    "browse.html": "a10e2c177ee017ddc5aa79d113d645f8d7f4a5fb3ee04dde99792c9520e12709",
+    "database-lab.html": "1de1657631119f803f713cbe0c5cfb7c807e0b1e14d093b29129618d090ee75d",
+    "favourites.html": "a0be4a6795ae2b7017db83ae44aac6a829f4779a018cc1a093ca8f080a466d4c",
+    "index.html": "fa728d1a6741538acc19c8e4b8f516559fdd73fa9123b0ee92d2442643c000b6",
+    "restaurant.html": "a353f3d86239407b7c9509af03f51c81cdd4bcd77f948398fa67678656b6ddc8",
+    "settings.html": "72a17c50fe25ef545678e639c093d0e42aca801e5bca5b76f589a6dc4accc545"
+  },
+  "health": {
+    "status": "ok",
+    "service": "Makan Where",
+    "database": "connected",
+    "mongoDB": "connected"
+  },
+  "venue14MenuCount": 45,
+  "applicationCodeUnchanged": true,
+  "existing106TestEvidenceCurrent": true,
+  "localVisualChecks": {
+    "desktop": true,
+    "phoneViewport": {
+      "width": 390,
+      "height": 844,
+      "documentScrollWidth": 375
+    },
+    "darkSignInPage": true,
+    "logoDisplayPixels": 40,
+    "homeLinkMinimumHeight": 44
+  },
+  "designDetector": "Run once; warnings concerned existing theme styles and page copy outside the logo update.",
+  "liveBrowser": {
+    "logoLoaded": true,
+    "logoDisplayWidth": 40,
+    "logoDisplayHeight": 40,
+    "homeLinkName": "MakanWhereSG home",
+    "favicon": "assets/brand/makanwhere-mark.svg?v=57e6ef555ca2",
+    "screenshot": "live-logo-2026-10-29.png"
+  }
+}

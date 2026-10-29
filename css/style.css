@@ -76,18 +76,29 @@ select {
   gap: 10px;
   font-weight: 800;
   font-size: 1.15rem;
+  min-height: 44px;
 }
 
 .brand-mark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--primary), #ff9d6b);
-  color: white;
-  box-shadow: var(--shadow);
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  line-height: 0;
+}
+
+.brand-mark img {
+  width: 40px;
+  height: 40px;
+}
+
+.brand:focus-visible,
+.auth-brand:focus-visible {
+  outline: 3px solid #a83c28;
+  outline-offset: 6px;
+  border-radius: 4px;
 }
 
 .nav-links {
@@ -710,6 +721,7 @@ button.primary:hover,
   align-items: center;
   gap: 10px;
   width: fit-content;
+  min-height: 44px;
   font-size: 1.15rem;
   font-weight: 800;
 }
